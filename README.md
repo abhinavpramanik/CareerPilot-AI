@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  
+# 🚀 CareerPilot AI
+**Your Intelligent Career Mentor & Placement Readiness Platform**
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+[![Google Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![NextAuth](https://img.shields.io/badge/NextAuth-v5-magenta?style=for-the-badge)](https://next-auth.js.org/)
 
-First, run the development server:
+**[Live Deployment Placeholder — Insert URL Here]**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+</div>
+
+---
+
+## 🌟 Overview
+
+**CareerPilot AI** is a comprehensive, AI-powered career intelligence platform built specifically for college students and fresh graduates. Navigating the journey from academia to industry can be overwhelming. CareerPilot bridges this gap by evaluating user profiles, predicting placement readiness, and providing hyper-personalized, actionable roadmaps.
+
+Unlike generic advice platforms, CareerPilot AI uses advanced generative AI (Google Gemini) to deeply analyze unstructured data (like PDF resumes) and turn it into structured, quantifiable insights.
+
+---
+
+## ✨ Core Features
+
+*   📄 **AI Resume Parsing & Analysis:** Upload a PDF resume and let our engine instantly extract and categorize your education, skills, projects, and experiences without manual data entry.
+*   📊 **Career Score Dashboard:** Get a holistic "Placement Readiness Score" based on a rigorous evaluation of your skills, project quality, and industry alignment.
+*   🎯 **Skill Gap Identification:** The AI compares your current skillset against industry standards for your target role and highlights exactly what you are missing.
+*   🗺️ **Personalized Learning Roadmaps:** Generates week-by-week, actionable learning paths with specific milestones and resource recommendations to bridge your skill gaps.
+*   🤖 **ATS Review:** Evaluates your resume through the lens of an Applicant Tracking System, giving you a compatibility score and actionable keyword suggestions.
+*   🎤 **Interview Preparation:** Simulates role-specific interview scenarios, generating technical and behavioral questions tailored specifically to your resume and target role.
+
+---
+
+## 🏗️ Architecture & Technology Stack
+
+CareerPilot AI is built on a modern, serverless-first stack designed for extreme speed, scalability, and developer experience.
+
+### **Frontend Layer**
+*   **Next.js 16 (App Router):** Leverages React Server Components (RSC) for maximum performance and minimal client-side JavaScript.
+*   **Tailwind CSS:** For rapid, utility-first styling.
+*   **Shadcn/ui:** Accessible, customizable, and beautifully designed unstyled components.
+*   **Framer Motion:** For fluid, micro-interaction animations that create a premium, dynamic feel.
+*   **Lucide Icons:** Clean, consistent iconography.
+
+### **Backend Layer (Next.js API Routes)**
+*   **Serverless Handlers:** `force-dynamic` API routes to handle authentication, file processing, and AI generation.
+*   **PDF-JS Dist:** Custom Node.js implementation of Mozilla's PDF reader to accurately extract text from raw binary PDF buffers without relying on browser DOM APIs.
+
+### **Data & AI Layer**
+*   **Google Gemini API (`gemini-flash-lite-latest`):** The core intelligence engine. We use highly engineered structured prompts to enforce that the AI **only returns validated JSON schemas**, allowing the frontend to confidently render complex dashboards.
+*   **MongoDB (Mongoose):** Flexible document database to store complex, nested AI analysis results (roadmaps, scores, project details) per user.
+*   **NextAuth.js (Auth.js v5):** Robust, secure authentication supporting both Google OAuth and standard Email/Password credentials with Bcrypt hashing.
+
+---
+
+## 📐 System Architecture Flow
+
+```mermaid
+graph TD
+    Client[Client Browser] -->|Uploads PDF / Triggers Analysis| NextAPI[Next.js API Routes]
+    
+    subgraph Server-Side Processing
+        NextAPI -->|1. Authenticate| Auth[NextAuth.js / JWT Session]
+        NextAPI -->|2. Parse Binary Buffer| PDFExtractor[pdfjs-dist Text Extractor]
+        PDFExtractor -->|3. Raw Text| AIPrompt[Prompt Engineering Builder]
+    end
+    
+    subgraph External Services
+        AIPrompt -->|4. Send Prompt| Gemini[Google Gemini AI]
+        Gemini -->|5. Return Structured JSON| NextAPI
+    end
+    
+    subgraph Data Persistence
+        NextAPI -->|6. Save Analysis| MongoDB[(MongoDB Atlas)]
+    end
+    
+    NextAPI -->|7. Return Dashboard Data| Client
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started (Local Development)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Prerequisites
+*   Node.js (v18 or higher)
+*   MongoDB URI (Local or Atlas)
+*   Google Gemini API Key (Generate one at [Google AI Studio](https://aistudio.google.com/))
+*   Google OAuth Credentials (Optional, for Google Login)
 
-## Learn More
+### 2. Clone the Repository
+```bash
+git clone <your-repo-url>
+cd careerpilot-ai
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Install Dependencies
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Environment Variables
+Create a `.env.local` file in the root directory and populate it with the following keys:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env
+# MongoDB Database
+MONGODB_URI="mongodb+srv://<user>:<password>@cluster.mongodb.net/careerpilot"
 
-## Deploy on Vercel
+# NextAuth Configuration
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="generate-a-random-32-char-string-here"
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Google Gemini AI Key
+GEMINI_API_KEY="your-gemini-api-key"
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Google OAuth (Optional)
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+```
+
+### 5. Run the Development Server
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🎨 Design Philosophy
+The UI/UX is heavily inspired by modern developer tools (Vercel, Linear). It utilizes dark mode natively, with soft pastel accents, glassmorphism (`backdrop-blur`), and subtle hover micro-animations to create an interface that feels highly premium, responsive, and alive.
+
+---
+
+<div align="center">
+  <i>Built with ❤️ for students navigating their career paths.</i>
+</div>
