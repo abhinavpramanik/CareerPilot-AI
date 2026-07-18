@@ -23,14 +23,12 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
     process.cwd(),
     "node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs"
   );
-  // @ts-expect-error GlobalWorkerOptions is writable at runtime
   pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
 
   const uint8Array = new Uint8Array(buffer);
   const loadingTask = pdfjsLib.getDocument({
     data: uint8Array,
     useWorkerFetch: false,
-    isEvalSupported: false,
     useSystemFonts: true,
   });
   const pdfDocument = await loadingTask.promise;
