@@ -18,21 +18,44 @@ if (typeof global.ImageData === "undefined") {
   (global as any).ImageData = class ImageData {};
 }
 
-const pdfParse = require("pdf-parse");
+import path from "path";
 
 /**
- * Extract plain text from a PDF buffer using pdf-parse.
- * This is robust for Node.js environments (like Vercel) and avoids
- * DOMMatrix or canvas dependency errors that newer pdfjs-dist versions throw.
+ * Extract plain text from a PDF buffer using pdfjs-dist (Node.js compatible).
+ * We point GlobalWorkerOptions.workerSrc to the bundled worker .mjs file so
+ * pdfjs-dist can spawn it as a sub-process — no DOMMatrix / canvas needed.
  */
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
-  try {
-    const data = await pdfParse(buffer);
-    return data.text;
-  } catch (error) {
-    console.error("Failed to parse PDF:", error);
-    throw new Error("Could not extract text from PDF.");
+  const { pathToFileURL } = await import("url");
+  const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
+
+  // Convert the absolute worker path to a file:// URL (required on Windows)
+  const workerPath = path.resolve(
+    process.cwd(),
+    "node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs"
+  );
+  pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(workerPath).href;
+
+  const uint8Array = new Uint8Array(buffer);
+  const loadingTask = pdfjsLib.getDocument({
+    data: uint8Array,
+    useWorkerFetch: false,
+    useSystemFonts: true,
+  });
+  const pdfDocument = await loadingTask.promise;
+
+  const textPages: string[] = [];
+  for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+    const page = await pdfDocument.getPage(pageNum);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((item: any) => ("str" in item ? item.str : ""))
+      .join(" ");
+    textPages.push(pageText);
   }
+
+  return textPages.join("\n");
 }
 
 export async function POST(req: NextRequest) {
