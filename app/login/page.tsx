@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { authenticateUser } from "./actions";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Sparkles, Globe, Zap, CheckCircle, Loader2 } from "lucide-react";
@@ -26,17 +27,12 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
-      const res = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const res = await authenticateUser(email, password);
 
       if (res?.error) {
         setError(res.error);
-      } else if (res?.ok) {
+      } else if (res?.success) {
         router.push("/dashboard");
         router.refresh();
       }

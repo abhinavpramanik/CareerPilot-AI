@@ -4,6 +4,16 @@ import Credentials from "next-auth/providers/credentials";
 import connectDB from "./mongodb";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
+import { CredentialsSignin } from "next-auth";
+
+class CustomAuthError extends CredentialsSignin {
+  constructor(message: string) {
+    super(message);
+    this.code = message;
+    // Override type to force it into the JSON response for redirect: false
+    (this as any).type = message;
+  }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -19,7 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          throw new CustomAuthError("Email and password are required.");
         }
         await connectDB();
         let user = await User.findOne({ email: credentials.email });
@@ -36,12 +46,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         if (!user.password) {
-          throw new Error("Please login with Google");
+          throw new CustomAuthError("This email is connected to Google. Please sign in with Google.");
         }
 
         const isValid = await bcrypt.compare(credentials.password as string, user.password);
         if (!isValid) {
-          throw new Error("Invalid password");
+          throw new CustomAuthError("Invalid password. Please try again.");
         }
 
         return { id: user._id.toString(), email: user.email, name: user.name };
@@ -60,7 +70,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // For Credentials login, we already fetched the user, but for Google we might not have.
         // It's safest to do a quick DB check here to populate isOnboarded.
         await connectDB();
-        const dbUser = await User.findById(user.id) || await User.findOne({ email: user.email });
+        
+        let dbUser = null;
+        // If the ID is a valid MongoDB ObjectId (from Credentials login)
+        if (user.id && user.id.match(/^[0-9a-fA-F]{24}$/)) {
+          dbUser = await User.findById(user.id);
+        }
+        
+        // If not found by ID (Google login), search by email
+        if (!dbUser && user.email) {
+          dbUser = await User.findOne({ email: user.email });
+        }
+
+        // If still no user in DB, this is a first-time Google login, create the user!
+        if (!dbUser && user.email) {
+          dbUser = await User.create({
+            name: user.name || user.email.split("@")[0],
+            email: user.email,
+            image: user.image,
+          });
+        }
+
         if (dbUser) {
           token.id = dbUser._id.toString();
           token.isOnboarded = !!(dbUser.targetRole && dbUser.college);
