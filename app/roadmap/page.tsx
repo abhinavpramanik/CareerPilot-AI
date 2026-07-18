@@ -39,13 +39,19 @@ export default function RoadmapPage() {
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<RoadmapHistory[]>([]);
+  const [expandedId, setExpandedId] = useState<string[]>([]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (autoExpandNewest = false) => {
     try {
       const res = await fetch("/api/roadmap");
       if (res.ok) {
         const json = await res.json();
-        if (json.data) setHistory(json.data);
+        if (json.data) {
+          setHistory(json.data);
+          if (json.data.length > 0 && (autoExpandNewest || expandedId.length === 0)) {
+            setExpandedId([json.data[0]._id]);
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to fetch roadmap history:", error);
@@ -83,7 +89,7 @@ export default function RoadmapPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
       toast.success("Roadmap generated!");
-      await fetchHistory();
+      await fetchHistory(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to generate roadmap");
     } finally {
@@ -169,7 +175,7 @@ export default function RoadmapPage() {
       {history.length > 0 && !loading && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <h2 className="text-xl font-bold text-foreground">Previous Roadmaps</h2>
-          <Accordion type="single" collapsible defaultValue={history[0]?._id} className="w-full space-y-4">
+          <Accordion value={expandedId} onValueChange={setExpandedId} className="w-full space-y-4">
             {history.map((record) => {
               const totalHours = record.weeks.reduce((sum, w) => sum + w.estimatedHours, 0);
 
