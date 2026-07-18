@@ -52,15 +52,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
+        
+        // When a user logs in, we need to check if they have filled their profile.
+        // For Credentials login, we already fetched the user, but for Google we might not have.
+        // It's safest to do a quick DB check here to populate isOnboarded.
+        await connectDB();
+        const dbUser = await User.findById(user.id) || await User.findOne({ email: user.email });
+        if (dbUser) {
+          token.id = dbUser._id.toString();
+          token.isOnboarded = !!(dbUser.targetRole && dbUser.college);
+        } else {
+          token.isOnboarded = false;
+        }
       }
+
+      if (trigger === "update" && session?.isOnboarded !== undefined) {
+        token.isOnboarded = session.isOnboarded;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
+        session.user.isOnboarded = token.isOnboarded as boolean;
       }
       return session;
     },

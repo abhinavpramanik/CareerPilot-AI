@@ -13,6 +13,10 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  if (!session?.user?.isOnboarded) {
+    redirect("/profile?onboarding=true");
+  }
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar user={session.user} />
@@ -24,3 +28,4 @@ export default async function DashboardLayout({
     </div>
   );
 }
+
