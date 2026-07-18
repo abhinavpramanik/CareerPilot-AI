@@ -35,16 +35,11 @@ export async function POST(req: NextRequest) {
     const prompt = roadmapPrompt(targetRole, report.skillGap);
     const result = (await callGemini(prompt)) as RoadmapResult;
 
-    const roadmap = await Roadmap.findOneAndUpdate(
-      { userId: session.user.id },
-      {
-        userId: session.user.id,
-        targetRole,
-        weeks: result.weeks,
-        generatedAt: new Date(),
-      },
-      { upsert: true, new: true }
-    );
+    const roadmap = await Roadmap.create({
+      userId: session.user.id,
+      targetRole,
+      weeks: result.weeks,
+    });
 
     return NextResponse.json({ success: true, data: roadmap });
   } catch (error) {
@@ -64,11 +59,13 @@ export async function GET() {
     }
 
     await connectDB();
-    const roadmap = await Roadmap.findOne({ userId: session.user.id }).sort({
-      createdAt: -1,
+    
+    // Fetch all historical roadmaps sorted by newest first
+    const roadmaps = await Roadmap.find({ userId: session.user.id }).sort({
+      generatedAt: -1,
     });
 
-    return NextResponse.json({ data: roadmap });
+    return NextResponse.json({ data: roadmaps });
   } catch (error) {
     console.error("Error fetching roadmap:", error);
     return NextResponse.json({ error: "Failed to fetch roadmap" }, { status: 500 });

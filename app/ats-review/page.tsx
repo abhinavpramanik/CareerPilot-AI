@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   CheckSquare,
@@ -32,6 +32,21 @@ const scoreLabel = (score: number) => {
 export default function ATSReviewPage() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<ATSResult | null>(null);
+
+  useEffect(() => {
+    const fetchExisting = async () => {
+      try {
+        const res = await fetch("/api/ats-review");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) setData(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch existing ATS review", err);
+      }
+    };
+    fetchExisting();
+  }, []);
 
   const runReview = async () => {
     setLoading(true);

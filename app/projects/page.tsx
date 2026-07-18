@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FolderGit2, Sparkles, Loader2, RefreshCw, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,21 @@ const difficultyConfig = {
 export default function ProjectsPage() {
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const fetchExisting = async () => {
+      try {
+        const res = await fetch("/api/project-recommendation");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.projects) setProjects(json.data.projects);
+        }
+      } catch (err) {
+        console.error("Failed to fetch existing project recommendations", err);
+      }
+    };
+    fetchExisting();
+  }, []);
 
   const generate = async () => {
     setLoading(true);

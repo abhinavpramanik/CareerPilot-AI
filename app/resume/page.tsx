@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload,
@@ -32,9 +32,29 @@ interface ResumeData {
 export default function ResumePage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchExistingResume = async () => {
+      try {
+        const res = await fetch("/api/analyze-resume");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data) {
+            setResumeData(json.data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch existing resume:", error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchExistingResume();
+  }, []);
 
   const handleFile = (f: File) => {
     const allowed = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];

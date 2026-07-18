@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Brain,
@@ -25,7 +25,7 @@ import {
 import { toast } from "sonner";
 
 interface CareerScore {
-  overallScore: number;
+  careerScore: number;
   resumeScore: number;
   technicalScore: number;
   projectScore: number;
@@ -46,6 +46,21 @@ const scoreLabel = (score: number) => {
 export default function CareerAnalysisPage() {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<CareerScore | null>(null);
+
+  useEffect(() => {
+    const fetchExisting = async () => {
+      try {
+        const res = await fetch("/api/career-score");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && Object.keys(json.data).length > 0) setData(json.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch existing career score", err);
+      }
+    };
+    fetchExisting();
+  }, []);
 
   const generateScore = async () => {
     setLoading(true);
@@ -148,23 +163,23 @@ export default function CareerAnalysisPage() {
         >
           {/* Overall Score hero */}
           <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-emerald-400 p-8">
-            <div className="flex flex-col items-center gap-2 text-center md:flex-row md:text-left md:justify-between">
-              <div>
+            <div className="flex flex-col items-center gap-6 text-center md:flex-row md:text-left md:justify-between">
+              <div className="max-w-xl">
                 <p className="text-sm font-medium text-white/70 uppercase tracking-widest">Overall Career Score</p>
                 <div className="flex items-baseline gap-3 mt-1">
-                  <span className="text-7xl font-black text-white">{data.overallScore}</span>
+                  <span className="text-7xl font-black text-white">{data.careerScore}</span>
                   <span className="text-2xl text-white/60">/100</span>
                 </div>
                 <p className={`text-lg font-semibold mt-1 text-white`}>
-                  {scoreLabel(data.overallScore).label} — {data.summary.split(".")[0]}.
+                  {scoreLabel(data.careerScore).label} — {data.summary.split(".")[0]}.
                 </p>
               </div>
-              <div className="h-32 w-32 shrink-0">
+              <div className="h-56 w-56 md:h-60 md:w-60 shrink-0 mt-4 md:mt-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={radarData}>
+                  <RadarChart cx="50%" cy="50%" outerRadius="55%" data={radarData}>
                     <PolarGrid stroke="rgba(255,255,255,0.3)" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: "white", fontSize: 10 }} />
-                    <Radar dataKey="value" fill="rgba(255,255,255,0.25)" stroke="white" strokeWidth={1.5} />
+                    <PolarAngleAxis dataKey="subject" tick={{ fill: "white", fontSize: 11 }} />
+                    <Radar dataKey="value" fill="rgba(255,255,255,0.35)" stroke="white" strokeWidth={2} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>

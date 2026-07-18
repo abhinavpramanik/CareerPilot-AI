@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import { ResumeAnalysis } from "@/models/ResumeAnalysis";
+import { ProjectRecommendation } from "@/models/ProjectRecommendation";
 import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { projectPrompt } from "@/lib/prompts/project";
@@ -44,6 +45,18 @@ export async function POST() {
     const prompt = projectPrompt(profile, targetRole);
     const result = (await callGemini(prompt)) as ProjectRecommendationResult;
 
+    // Save full Project Recommendation result
+    await ProjectRecommendation.findOneAndUpdate(
+      { userId: session.user.id },
+      {
+        userId: session.user.id,
+        targetRole,
+        projects: result.projects,
+        generatedAt: new Date(),
+      },
+      { upsert: true, new: true }
+    );
+
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     console.error("Project recommendation error:", error);
@@ -51,5 +64,24 @@ export async function POST() {
       { error: "Failed to generate project recommendations. Please try again." },
       { status: 500 }
     );
+  }
+}
+
+export async function GET() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectDB();
+    const recommendations = await ProjectRecommendation.findOne({ userId: session.user.id }).sort({
+      createdAt: -1,
+    });
+
+    return NextResponse.json({ data: recommendations });
+  } catch (error) {
+    console.error("Error fetching project recommendations:", error);
+    return NextResponse.json({ error: "Failed to fetch project recommendations" }, { status: 500 });
   }
 }
