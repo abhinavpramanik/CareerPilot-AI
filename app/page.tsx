@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const features = [
   {
@@ -104,9 +105,6 @@ export default function LandingPage() {
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-bold text-foreground">CareerPilot AI</span>
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-xs border-0">
-              Beta
-            </Badge>
           </div>
           <div className="hidden items-center gap-8 md:flex">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -117,6 +115,7 @@ export default function LandingPage() {
             </a>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/login">
               <Button variant="ghost" size="sm" className="text-sm">
                 Sign in

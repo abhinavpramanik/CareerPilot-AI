@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -138,13 +139,16 @@ export function Sidebar({ user }: SidebarProps) {
               {user?.email ?? ""}
             </p>
           </div>
-          <button
-            title="Sign out"
-            className="h-7 w-7 shrink-0 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-accent transition-colors"
-            onClick={() => signOut({ callbackUrl: "/" })}
-          >
-            <LogOut className="h-3.5 w-3.5" />
-          </button>
+          <div className="flex shrink-0 items-center gap-1">
+            <ThemeToggle className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground" />
+            <button
+              title="Sign out"
+              className="h-7 w-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-accent transition-colors"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </aside>
