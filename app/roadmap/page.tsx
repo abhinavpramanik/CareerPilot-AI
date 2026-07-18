@@ -6,7 +6,20 @@ import { Map, Sparkles, Loader2, RefreshCw, Clock, CheckCircle2, Trash2 } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+const ROLE_SUGGESTIONS = [
+  "Full Stack Developer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Data Scientist",
+  "Machine Learning Engineer",
+  "DevOps Engineer",
+  "Android Developer",
+  "iOS Developer",
+  "Cybersecurity Analyst",
+];
 
 interface RoadmapWeek {
   week: number;
@@ -23,6 +36,7 @@ interface RoadmapHistory {
 }
 
 export default function RoadmapPage() {
+  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<RoadmapHistory[]>([]);
 
@@ -58,9 +72,14 @@ export default function RoadmapPage() {
   }, []);
 
   const generate = async () => {
+    if (!role.trim()) { toast.error("Please enter a target role"); return; }
     setLoading(true);
     try {
-      const res = await fetch("/api/roadmap", { method: "POST" });
+      const res = await fetch("/api/roadmap", { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetRole: role }),
+      });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
       toast.success("Roadmap generated!");
@@ -74,24 +93,51 @@ export default function RoadmapPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Learning Roadmap</h1>
-          <p className="mt-1 text-muted-foreground">
-            Your personalized 6-week AI-generated learning plan.
-          </p>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Learning Roadmap</h1>
+        <p className="mt-1 text-muted-foreground">
+          Your personalized 6-week AI-generated learning plan.
+        </p>
+      </div>
+
+      {/* Role Input */}
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <h3 className="mb-4 font-semibold text-foreground">Select your target role</h3>
+        <div className="flex gap-3">
+          <Input
+            placeholder="e.g. Full Stack Developer"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && generate()}
+            className="rounded-xl"
+          />
+          <Button
+            onClick={generate}
+            disabled={loading}
+            className="shrink-0 rounded-full bg-primary text-white gap-2"
+          >
+            {loading ? (
+              <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
+            ) : (
+              <><Sparkles className="h-4 w-4" />Generate Roadmap</>
+            )}
+          </Button>
         </div>
-        <Button
-          onClick={generate}
-          disabled={loading}
-          className="rounded-full bg-primary text-white gap-2"
-        >
-          {loading ? (
-            <><Loader2 className="h-4 w-4 animate-spin" />Generating...</>
-          ) : (
-            <><Sparkles className="h-4 w-4" />Generate Roadmap</>
-          )}
-        </Button>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {ROLE_SUGGESTIONS.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRole(r)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                role === r
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading && (

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import { CareerReport } from "@/models/CareerReport";
+import { SkillGap } from "@/models/SkillGap";
 import { Roadmap } from "@/models/Roadmap";
 import { callGemini } from "@/lib/gemini";
 import { roadmapPrompt } from "@/lib/prompts/roadmap";
@@ -16,23 +17,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json().catch(() => ({}));
+    const { targetRole } = await req.json().catch(() => ({}));
+    if (!targetRole) {
+      return NextResponse.json({ error: "Target role is required" }, { status: 400 });
+    }
 
     await connectDB();
 
-    const report = await CareerReport.findOne({ userId: session.user.id }).sort({
-      createdAt: -1,
+    const skillGapRecord = await SkillGap.findOne({ userId: session.user.id, targetRole }).sort({
+      generatedAt: -1,
     });
 
-    if (!report?.skillGap?.length) {
-      return NextResponse.json(
-        { error: "Please complete Skill Gap analysis first" },
-        { status: 400 }
-      );
-    }
+    // We can still generate a roadmap even without a skill gap, 
+    // but the AI prompt might be better with it.
+    const missingSkills = skillGapRecord ? skillGapRecord.missingSkills : [];
 
-    const targetRole = body.targetRole || report.targetRole || "Software Developer";
-    const prompt = roadmapPrompt(targetRole, report.skillGap);
+    const prompt = roadmapPrompt(targetRole, missingSkills);
     const result = (await callGemini(prompt)) as RoadmapResult;
 
     const roadmap = await Roadmap.create({
