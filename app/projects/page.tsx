@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FolderGit2, Sparkles, Loader2, RefreshCw, Clock } from "lucide-react";
+import { FolderGit2, Sparkles, Loader2, RefreshCw, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -131,7 +131,7 @@ export default function ProjectsPage() {
               <h3 className="mb-2 font-bold text-foreground">{p.title}</h3>
               <p className="mb-4 text-sm text-muted-foreground flex-1">{p.learningOutcome}</p>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div>
                   <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                     Tech Stack
@@ -145,9 +145,24 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock className="h-3.5 w-3.5" />
-                  ~{p.estimatedWeeks} week{p.estimatedWeeks !== 1 ? "s" : ""}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    ~{p.estimatedWeeks} week{p.estimatedWeeks !== 1 ? "s" : ""}
+                  </div>
+                  
+                  <a
+                    href={`https://chatgpt.com/?q=${encodeURIComponent(
+                      `Write a detailed Product Requirements Document (PRD) for a project called "${p.title}". The project aims to achieve the following learning outcome: ${p.learningOutcome}. It should use the following tech stack: ${p.techStack.join(', ')}. Please provide a detailed breakdown including user stories, technical architecture, and a step-by-step implementation plan.`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-white hover:bg-accent hover:text-accent-foreground h-8 px-3 shadow-sm"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Research
+                  </a>
                 </div>
               </div>
             </motion.div>
