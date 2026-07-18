@@ -181,7 +181,7 @@ export function DashboardClient({ user, report, hasResume }: DashboardClientProp
                         <p className="text-4xl font-bold text-foreground">{stat.value}</p>
                         <p className="text-xs text-muted-foreground mt-1">/100</p>
                       </div>
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
                         <stat.icon className={`h-4.5 w-4.5 ${stat.iconColor}`} />
                       </div>
                     </div>
@@ -204,7 +204,7 @@ export function DashboardClient({ user, report, hasResume }: DashboardClientProp
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="rounded-2xl border border-border bg-white p-6 shadow-sm"
+          className="rounded-2xl border border-border bg-card p-6 shadow-sm"
         >
           <div className="mb-3 flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
@@ -259,7 +259,7 @@ export function DashboardClient({ user, report, hasResume }: DashboardClientProp
               animate="visible"
             >
               <Link href={link.href}>
-                <div className="group flex items-center gap-4 rounded-2xl border border-border bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md cursor-pointer">
+                <div className="group flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md cursor-pointer">
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${link.bg}`}>
                     <link.icon className={`h-5 w-5 ${link.color}`} />
                   </div>

@@ -107,7 +107,7 @@ export default function RoadmapPage() {
       </div>
 
       {/* Role Input */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h3 className="mb-4 font-semibold text-foreground">Select your target role</h3>
         <div className="flex gap-3">
           <Input
@@ -147,7 +147,7 @@ export default function RoadmapPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
@@ -180,7 +180,7 @@ export default function RoadmapPage() {
               const totalHours = record.weeks.reduce((sum, w) => sum + w.estimatedHours, 0);
 
               return (
-                <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-white px-6 shadow-sm">
+                <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-card px-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
                     <AccordionTrigger className="hover:no-underline flex-1 text-left">
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-left w-full">
@@ -205,11 +205,11 @@ export default function RoadmapPage() {
                     <div className="space-y-6">
                       {/* Summary bar */}
                       <div className="flex flex-wrap gap-4">
-                        <div className="flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2">
+                        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">{totalHours} total hours</span>
                         </div>
-                        <div className="flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2">
+                        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2">
                           <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">{record.weeks.length} weeks</span>
                         </div>
@@ -224,11 +224,11 @@ export default function RoadmapPage() {
                           {record.weeks.map((week, i) => (
                             <div key={week.week} className="md:pl-16 relative">
                               {/* Circle on timeline */}
-                              <div className="absolute left-3.5 top-5 hidden h-5 w-5 items-center justify-center rounded-full border-2 border-primary bg-white md:flex">
+                              <div className="absolute left-3.5 top-5 hidden h-5 w-5 items-center justify-center rounded-full border-2 border-primary bg-card md:flex">
                                 <span className="text-[9px] font-bold text-primary">{week.week}</span>
                               </div>
 
-                              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="mb-4 flex items-center justify-between">
                                   <div className="flex items-center gap-3">
                                     <Badge className="bg-primary/10 text-primary border-0">Week {week.week}</Badge>

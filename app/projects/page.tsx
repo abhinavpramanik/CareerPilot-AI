@@ -80,7 +80,7 @@ export default function ProjectsPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
@@ -117,10 +117,10 @@ export default function ProjectsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.07 }}
-              className={`group relative flex flex-col overflow-hidden rounded-3xl ${difficultyConfig[p.difficulty]?.card || "bg-white"} p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300`}
+              className={`group relative flex flex-col overflow-hidden rounded-3xl ${difficultyConfig[p.difficulty]?.card || "bg-card"} p-6 shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300`}
             >
               <div className="mb-3 flex items-start justify-between">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card shadow-sm">
                   <FolderGit2 className="h-5 w-5 text-foreground" />
                 </div>
                 <Badge className={difficultyConfig[p.difficulty]?.class || ""}>
@@ -157,7 +157,7 @@ export default function ProjectsPage() {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-white hover:bg-accent hover:text-accent-foreground h-8 px-3 shadow-sm"
+                    className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-card hover:bg-accent hover:text-accent-foreground h-8 px-3 shadow-sm"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ExternalLink className="h-3 w-3" />

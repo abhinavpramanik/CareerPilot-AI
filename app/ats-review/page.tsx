@@ -90,7 +90,7 @@ export default function ATSReviewPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
@@ -118,7 +118,7 @@ export default function ATSReviewPage() {
       {data && !loading && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {/* Score hero */}
-          <div className="rounded-3xl border border-border bg-white p-8 shadow-sm">
+          <div className="rounded-3xl border border-border bg-card p-8 shadow-sm">
             <div className="flex flex-col items-center gap-4 text-center md:flex-row md:text-left md:items-start md:justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">ATS Score</p>
@@ -142,7 +142,7 @@ export default function ATSReviewPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Keyword Issues */}
             {data.keywordIssues?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-amber-500" />
                   <h3 className="font-semibold text-foreground">Missing Keywords</h3>
@@ -161,7 +161,7 @@ export default function ATSReviewPage() {
 
             {/* Formatting Issues */}
             {data.formattingIssues?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-red-500" />
                   <h3 className="font-semibold text-foreground">Formatting Issues</h3>
@@ -181,7 +181,7 @@ export default function ATSReviewPage() {
 
           {/* Bullet Suggestions */}
           {data.bulletSuggestions?.length > 0 && (
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <h3 className="mb-4 font-semibold text-foreground">Bullet Point Improvements</h3>
               <div className="space-y-4">
                 {data.bulletSuggestions.map((b, i) => (

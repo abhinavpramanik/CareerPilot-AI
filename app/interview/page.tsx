@@ -42,7 +42,7 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="rounded-2xl border border-border bg-white overflow-hidden shadow-sm"
+      className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
     >
       <button
         onClick={() => setOpen(!open)}
@@ -179,7 +179,7 @@ export default function InterviewPage() {
       </div>
 
       {/* Settings */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm space-y-5">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm space-y-5">
         <div>
           <label className="mb-2 block text-sm font-medium text-foreground">Target Role</label>
           <Input
@@ -245,7 +245,7 @@ export default function InterviewPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />

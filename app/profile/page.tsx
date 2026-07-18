@@ -155,7 +155,7 @@ function ChipOption({
       className={`relative flex items-center justify-between gap-3 rounded-2xl border-2 px-5 py-3.5 text-left text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
         selected
           ? "border-primary bg-primary/8 text-primary shadow-md shadow-primary/10"
-          : "border-border bg-white text-foreground hover:border-primary/40 hover:bg-primary/3"
+          : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/3"
       }`}
     >
       <span>{label}</span>
@@ -518,7 +518,7 @@ function OnboardingContent() {
                 placeholder={currentStep.placeholder}
                 onChange={(e) => handleSetAnswer(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleContinue()}
-                className="w-full rounded-2xl border-2 border-border bg-white px-5 py-4 text-lg font-medium text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:border-primary focus:shadow-md focus:shadow-primary/10"
+                className="w-full rounded-2xl border-2 border-border bg-card px-5 py-4 text-lg font-medium text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:border-primary focus:shadow-md focus:shadow-primary/10"
               />
             )}
 
@@ -531,7 +531,7 @@ function OnboardingContent() {
                     value={chipFilter}
                     placeholder="Search…"
                     onChange={(e) => setChipFilter(e.target.value)}
-                    className="mb-4 w-full rounded-2xl border-2 border-border bg-white px-5 py-3 text-base text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:border-primary"
+                    className="mb-4 w-full rounded-2xl border-2 border-border bg-card px-5 py-3 text-base text-foreground placeholder:text-muted-foreground/50 outline-none transition-all focus:border-primary"
                   />
                 )}
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -566,7 +566,7 @@ function OnboardingContent() {
                     className={`rounded-2xl border-2 px-8 py-4 text-xl font-bold transition-all ${
                       currentValue === yr
                         ? "border-primary bg-primary text-white shadow-lg shadow-primary/30"
-                        : "border-border bg-white text-foreground hover:border-primary/50"
+                        : "border-border bg-card text-foreground hover:border-primary/50"
                     }`}
                   >
                     {yr}
@@ -683,7 +683,7 @@ function ProfileEditMode() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-white p-6 shadow-sm"
+        className="rounded-2xl border border-border bg-card p-6 shadow-sm"
       >
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">

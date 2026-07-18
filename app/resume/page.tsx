@@ -200,7 +200,7 @@ export default function ResumePage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-2xl border border-border bg-white p-8 text-center"
+          className="rounded-2xl border border-border bg-card p-8 text-center"
         >
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
@@ -233,7 +233,7 @@ export default function ResumePage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Skills */}
             {resumeData.skills?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
                     <Code className="h-4 w-4 text-emerald-600" />
@@ -253,7 +253,7 @@ export default function ResumePage() {
 
             {/* Technologies */}
             {resumeData.technologies?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
                     <Sparkles className="h-4 w-4 text-blue-600" />
@@ -273,7 +273,7 @@ export default function ResumePage() {
 
             {/* Education */}
             {resumeData.education?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
                     <GraduationCap className="h-4 w-4 text-violet-600" />
@@ -293,7 +293,7 @@ export default function ResumePage() {
 
             {/* Experience */}
             {resumeData.experience?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
                     <Briefcase className="h-4 w-4 text-amber-600" />
@@ -314,7 +314,7 @@ export default function ResumePage() {
 
           {/* Projects */}
           {resumeData.projects?.length > 0 && (
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
                   <Trophy className="h-4 w-4 text-orange-600" />

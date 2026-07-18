@@ -115,7 +115,7 @@ export default function SkillGapPage() {
       </div>
 
       {/* Role Input */}
-      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h3 className="mb-4 font-semibold text-foreground">Select your target role</h3>
         <div className="flex gap-3">
           <Input
@@ -156,7 +156,7 @@ export default function SkillGapPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
@@ -182,7 +182,7 @@ export default function SkillGapPage() {
               const lowCount = skills.filter((s) => s.priority === "Low").length;
 
               return (
-                <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-white px-6 shadow-sm">
+                <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-card px-6 shadow-sm">
                   <div className="flex items-center justify-between gap-4">
                     <AccordionTrigger className="hover:no-underline flex-1 text-left">
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-left w-full">
@@ -234,7 +234,7 @@ export default function SkillGapPage() {
                                 {prioritySkills.map((skill, i) => (
                                   <div
                                     key={skill.name}
-                                    className="rounded-xl border border-border bg-white p-4 shadow-sm"
+                                    className="rounded-xl border border-border bg-card p-4 shadow-sm"
                                   >
                                     <div className="mb-3 flex items-start justify-between">
                                       <h4 className="font-semibold text-foreground">{skill.name}</h4>

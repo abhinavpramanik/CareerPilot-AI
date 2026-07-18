@@ -124,7 +124,7 @@ export default function CareerAnalysisPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="rounded-2xl border border-border bg-white p-12 text-center">
+        <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-20 w-20 items-center justify-center">
               <div className="absolute inset-0 animate-ping rounded-full bg-primary/20" />
@@ -187,7 +187,7 @@ export default function CareerAnalysisPage() {
           </div>
 
           {/* Score Breakdown */}
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <h3 className="mb-5 font-semibold text-foreground">Score Breakdown</h3>
             <div className="space-y-4">
               {metrics.map((m, i) => (
@@ -212,7 +212,7 @@ export default function CareerAnalysisPage() {
           {/* Strengths & Weaknesses */}
           <div className="grid gap-6 md:grid-cols-2">
             {data.strengths?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
                     <TrendingUp className="h-4 w-4 text-emerald-600" />
@@ -231,7 +231,7 @@ export default function CareerAnalysisPage() {
             )}
 
             {data.weaknesses?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
                     <TrendingDown className="h-4 w-4 text-red-500" />

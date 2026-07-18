@@ -97,7 +97,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-border/60 bg-white/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
@@ -241,7 +241,7 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 className={`group relative overflow-hidden rounded-3xl p-6 ${feature.color} shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md`}
               >
-                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-sm">
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-background shadow-sm dark:bg-black/20">
                   <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
                 </div>
                 <h3 className="mb-2 text-lg font-semibold text-foreground">
@@ -284,7 +284,7 @@ export default function LandingPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="relative rounded-3xl bg-white p-6 shadow-sm"
+                className="relative rounded-3xl bg-card p-6 shadow-sm border border-border"
               >
                 <span className="mb-4 inline-block text-5xl font-black text-primary/15">
                   {s.step}
@@ -334,7 +334,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-white px-6 py-8">
+      <footer className="border-t border-border bg-background px-6 py-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary">
