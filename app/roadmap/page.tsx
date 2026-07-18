@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Map, Sparkles, Loader2, RefreshCw, Clock, CheckCircle2 } from "lucide-react";
+import { Map, Sparkles, Loader2, RefreshCw, Clock, CheckCircle2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -35,6 +35,21 @@ export default function RoadmapPage() {
       }
     } catch (error) {
       console.error("Failed to fetch roadmap history:", error);
+    }
+  };
+
+  const deleteRecord = async (id: string) => {
+    try {
+      const res = await fetch("/api/roadmap", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      toast.success("Deleted successfully");
+      await fetchHistory();
+    } catch (err) {
+      toast.error("Failed to delete record");
     }
   };
 
@@ -114,16 +129,26 @@ export default function RoadmapPage() {
 
               return (
                 <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-white px-6 shadow-sm">
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-left w-full">
-                      <span className="font-semibold text-lg">{record.targetRole}</span>
-                      <span className="text-xs text-muted-foreground font-normal">
-                        {new Date(record.generatedAt).toLocaleDateString(undefined, {
-                          month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                  </AccordionTrigger>
+                  <div className="flex items-center justify-between gap-4">
+                    <AccordionTrigger className="hover:no-underline flex-1 text-left">
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-left w-full">
+                        <span className="font-semibold text-lg">{record.targetRole}</span>
+                        <span className="text-xs text-muted-foreground font-normal">
+                          {new Date(record.generatedAt).toLocaleDateString(undefined, {
+                            month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                    </AccordionTrigger>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-muted-foreground hover:text-red-500 hover:bg-red-50 shrink-0"
+                      onClick={() => deleteRecord(record._id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <AccordionContent className="pt-4 pb-6">
                     <div className="space-y-6">
                       {/* Summary bar */}
