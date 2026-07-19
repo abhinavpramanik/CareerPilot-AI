@@ -9,7 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![NextAuth](https://img.shields.io/badge/NextAuth-v5-magenta?style=for-the-badge)](https://next-auth.js.org/)
 
-**[Live Deployment Placeholder — Insert URL Here]**
+**Live Demo:** [https://career-pilot-ai-1wmq.vercel.app/](https://career-pilot-ai-1wmq.vercel.app/)
 
 </div>
 
