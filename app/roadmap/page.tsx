@@ -75,6 +75,14 @@ export default function RoadmapPage() {
 
   useEffect(() => {
     fetchHistory();
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.data?.targetRole) {
+          setRole(json.data.targetRole);
+        }
+      })
+      .catch((err) => console.error("Failed to load profile target role", err));
   }, []);
 
   const generate = async () => {

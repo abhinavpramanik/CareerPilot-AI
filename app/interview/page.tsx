@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mic, Sparkles, Loader2, ChevronDown, ChevronUp, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+const ROLE_SUGGESTIONS = [
+  "Full Stack Developer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Data Scientist",
+  "Machine Learning Engineer",
+  "DevOps Engineer",
+  "Android Developer",
+  "iOS Developer",
+  "Cybersecurity Analyst",
+];
 
 type InterviewType = "technical" | "hr";
 type Difficulty = "easy" | "medium" | "hard";
@@ -149,6 +161,17 @@ export default function InterviewPage() {
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState<(TechnicalQ | HRQ)[]>([]);
 
+  useEffect(() => {
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json?.data?.targetRole) {
+          setRole(json.data.targetRole);
+        }
+      })
+      .catch((err) => console.error("Failed to load profile target role", err));
+  }, []);
+
   const generate = async () => {
     if (!role.trim()) { toast.error("Please enter a target role"); return; }
     setLoading(true);
@@ -188,6 +211,21 @@ export default function InterviewPage() {
             onChange={(e) => setRole(e.target.value)}
             className="rounded-xl"
           />
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ROLE_SUGGESTIONS.map((r) => (
+              <button
+                key={r}
+                onClick={() => setRole(r)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                  role === r
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
