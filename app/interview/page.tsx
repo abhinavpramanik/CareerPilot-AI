@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { z } from "zod";
 
 const ROLE_SUGGESTIONS = [
   "Full Stack Developer",
@@ -46,8 +48,8 @@ const difficultyColors: Record<Difficulty, string> = {
 function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; type: InterviewType }) {
   const [open, setOpen] = useState(false);
   const isTech = type === "technical";
-  const tech = q as TechnicalQ;
-  const hr = q as HRQ;
+  const tech = (q || {}) as TechnicalQ;
+  const hr = (q || {}) as HRQ;
 
   return (
     <motion.div
@@ -64,7 +66,7 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
           <span className="mt-0.5 text-xs font-bold text-primary shrink-0 bg-primary/10 rounded-full h-6 w-6 flex items-center justify-center">
             {index + 1}
           </span>
-          <p className="text-sm font-medium text-foreground leading-relaxed">{q.question}</p>
+          <p className="text-sm font-medium text-foreground leading-relaxed">{q?.question || "Generating question..."}</p>
         </div>
         {open ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
@@ -125,13 +127,13 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
                       Sample Answer
                     </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{hr.sampleAnswer}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{hr.sampleAnswer || "Generating answer..."}</p>
                   </div>
                   <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 p-4">
                     <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-500 mb-1.5">
                       STAR Method Guidance
                     </p>
-                    <p className="text-xs text-muted-foreground">{hr.starGuidance}</p>
+                    <p className="text-xs text-muted-foreground">{hr.starGuidance || "Generating guidance..."}</p>
                   </div>
                   {hr.personalizationTip && (
                     <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
@@ -158,8 +160,17 @@ export default function InterviewPage() {
   const [role, setRole] = useState("");
   const [type, setType] = useState<InterviewType>("technical");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
-  const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState<(TechnicalQ | HRQ)[]>([]);
+  
+  const { submit, isLoading: loading, object, stop } = useObject({
+    api: "/api/interview-preparation",
+    schema: z.object({
+      questions: z.array(z.any()),
+    }),
+    onFinish: () => { toast.success("Questions generated!"); },
+    onError: (error) => { toast.error(error.message || "Generation failed"); },
+  });
+
+  const questions = object?.questions || [];
 
   useEffect(() => {
     fetch("/api/profile")
@@ -172,24 +183,9 @@ export default function InterviewPage() {
       .catch((err) => console.error("Failed to load profile target role", err));
   }, []);
 
-  const generate = async () => {
+  const generate = () => {
     if (!role.trim()) { toast.error("Please enter a target role"); return; }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/interview-preparation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, interviewType: type, difficulty }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-      setQuestions(json.data.questions);
-      toast.success(`${json.data.questions.length} questions generated!`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Generation failed");
-    } finally {
-      setLoading(false);
-    }
+    submit({ role, interviewType: type, difficulty });
   };
 
   return (
@@ -279,10 +275,15 @@ export default function InterviewPage() {
             <><Sparkles className="h-4 w-4" />Generate Interview Questions</>
           )}
         </Button>
+        {loading && (
+          <Button variant="outline" onClick={stop} className="w-full rounded-xl gap-2 mt-2">
+            Stop Generation
+          </Button>
+        )}
       </div>
 
-      {/* Loading */}
-      {loading && (
+      {/* Loading Screen */}
+      {loading && questions.length === 0 && (
         <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
@@ -297,7 +298,7 @@ export default function InterviewPage() {
       )}
 
       {/* Questions */}
-      {questions.length > 0 && !loading && (
+      {questions.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <h3 className="font-semibold text-foreground">{questions.length} Questions</h3>

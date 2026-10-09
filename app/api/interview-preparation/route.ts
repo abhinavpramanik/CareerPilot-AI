@@ -8,6 +8,13 @@ import { InterviewPrep } from "@/models/InterviewPrep";
 import { callGemini } from "@/lib/gemini";
 import { technicalInterviewPrompt, hrInterviewPrompt } from "@/lib/prompts/interview";
 import { InterviewResult, ResumeProfile } from "@/types";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamObject } from "ai";
+import { z } from "zod";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,17 +60,46 @@ export async function POST(req: NextRequest) {
         ? technicalInterviewPrompt(profile, role, difficulty)
         : hrInterviewPrompt(profile, role, difficulty);
 
-    const result = (await callGemini(prompt)) as InterviewResult;
-
-    const saved = await InterviewPrep.create({
-      userId: session.user.id,
-      role,
-      interviewType,
-      difficulty,
-      questions: result.questions,
+    const TechnicalQSchema = z.object({
+      question: z.string(),
+      expectedAnswer: z.string(),
+      keyConcepts: z.array(z.string()),
+      followUps: z.array(z.string()),
     });
 
-    return NextResponse.json({ success: true, data: saved });
+    const HRQSchema = z.object({
+      question: z.string(),
+      sampleAnswer: z.string(),
+      starGuidance: z.string(),
+      personalizationTip: z.string(),
+    });
+
+    const schema = z.object({
+      questions: z.array(interviewType === "technical" ? TechnicalQSchema : HRQSchema),
+    });
+
+    const result = await streamObject({
+      model: google("gemini-flash-lite-latest"), // keeping same model as lib/gemini.ts
+      schema,
+      prompt,
+      onFinish: async ({ object }) => {
+        if (object?.questions) {
+          try {
+            await InterviewPrep.create({
+              userId: session.user.id,
+              role,
+              interviewType,
+              difficulty,
+              questions: object.questions,
+            });
+          } catch (e) {
+            console.error("Error saving streamed interview questions:", e);
+          }
+        }
+      },
+    });
+
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("Interview prep error:", error);
     return NextResponse.json(
