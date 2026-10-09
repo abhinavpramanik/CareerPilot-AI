@@ -50,9 +50,10 @@ interface SidebarProps {
     email?: string | null;
     image?: string | null;
   };
+  isMobile?: boolean;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, isMobile }: SidebarProps) {
   const pathname = usePathname();
 
   const SidebarContent = () => (
@@ -163,7 +164,7 @@ export function Sidebar({ user }: SidebarProps) {
 
   return (
     <>
-      <aside className="hidden md:flex h-full w-72 flex-col border-r border-border bg-card">
+      <aside className={cn("h-full w-72 flex-col border-r border-border bg-card", isMobile ? "flex border-none" : "hidden md:flex")}>
         <SidebarContent />
       </aside>
     </>
@@ -194,7 +195,7 @@ export function MobileNav({ user }: SidebarProps) {
             <Menu className="h-5 w-5" />
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 border-r-border">
-            <Sidebar user={user} />
+            <Sidebar user={user} isMobile={true} />
           </SheetContent>
         </Sheet>
       </div>

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { Sidebar, MobileNav } from "@/components/layout/Sidebar";
 
 export default async function SettingsLayout({
   children,
@@ -21,6 +21,7 @@ export default async function SettingsLayout({
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar user={session.user} />
       <main className="flex flex-1 flex-col overflow-hidden">
+        <MobileNav user={session?.user} />
         <div className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-5xl p-6 md:p-8">{children}</div>
         </div>
