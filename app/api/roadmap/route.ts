@@ -6,9 +6,10 @@ import connectDB from "@/lib/mongodb";
 import { CareerReport } from "@/models/CareerReport";
 import { SkillGap } from "@/models/SkillGap";
 import { Roadmap } from "@/models/Roadmap";
+import { ResumeAnalysis } from "@/models/ResumeAnalysis";
 import { callGemini } from "@/lib/gemini";
 import { roadmapPrompt } from "@/lib/prompts/roadmap";
-import { RoadmapResult } from "@/types";
+import { RoadmapResult, ResumeProfile } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,11 +29,26 @@ export async function POST(req: NextRequest) {
       generatedAt: -1,
     });
 
-    // We can still generate a roadmap even without a skill gap, 
-    // but the AI prompt might be better with it.
-    const missingSkills = skillGapRecord ? skillGapRecord.missingSkills : [];
+    const resume = await ResumeAnalysis.findOne({ userId: session.user.id }).sort({
+      createdAt: -1,
+    });
 
-    const prompt = roadmapPrompt(targetRole, missingSkills);
+    const missingSkills = skillGapRecord ? skillGapRecord.missingSkills : [];
+    
+    let profile: ResumeProfile | null = null;
+    if (resume) {
+      profile = {
+        education: resume.education,
+        skills: resume.skills,
+        projects: resume.projects,
+        experience: resume.experience,
+        achievements: resume.achievements,
+        technologies: resume.technologies,
+        certifications: resume.certifications,
+      };
+    }
+
+    const prompt = roadmapPrompt(targetRole, missingSkills, profile);
     const result = (await callGemini(prompt)) as RoadmapResult;
 
     const roadmap = await Roadmap.create({
