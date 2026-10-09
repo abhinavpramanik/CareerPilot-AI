@@ -127,3 +127,22 @@ export async function GET() {
     return NextResponse.json({ error: "Failed to fetch interview sessions" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await req.json();
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+
+    await connectDB();
+    await InterviewPrep.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("DELETE /api/interview-preparation error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

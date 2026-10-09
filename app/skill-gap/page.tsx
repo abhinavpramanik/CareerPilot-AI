@@ -7,6 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 const ROLE_SUGGESTIONS = [
@@ -46,6 +56,7 @@ export default function SkillGapPage() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<SkillGapHistory[]>([]);
   const [expandedId, setExpandedId] = useState<string[]>([]);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const fetchHistory = async (autoExpandNewest = false) => {
     try {
@@ -198,7 +209,7 @@ export default function SkillGapPage() {
                       variant="ghost" 
                       size="icon" 
                       className="text-muted-foreground hover:text-red-500 hover:bg-red-50 shrink-0"
-                      onClick={() => deleteRecord(record._id)}
+                      onClick={() => setDeleteId(record._id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -273,6 +284,29 @@ export default function SkillGapPage() {
           </Accordion>
         </motion.div>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this analysis from your history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                if (deleteId) deleteRecord(deleteId);
+                setDeleteId(null);
+              }}
+              className="rounded-xl bg-red-500 hover:bg-red-600 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

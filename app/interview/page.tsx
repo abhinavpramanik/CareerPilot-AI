@@ -2,11 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Sparkles, Loader2, ChevronDown, ChevronUp, Star } from "lucide-react";
+import { Mic, Sparkles, Loader2, ChevronDown, ChevronUp, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { experimental_useObject as useObject } from "@ai-sdk/react";
 import { z } from "zod";
 
@@ -37,6 +48,15 @@ interface HRQ {
   sampleAnswer: string;
   starGuidance: string;
   personalizationTip: string;
+}
+
+interface InterviewHistory {
+  _id: string;
+  role: string;
+  interviewType: InterviewType;
+  difficulty: Difficulty;
+  createdAt: string;
+  questions: (TechnicalQ | HRQ)[];
 }
 
 const difficultyColors: Record<Difficulty, string> = {
@@ -160,19 +180,58 @@ export default function InterviewPage() {
   const [role, setRole] = useState("");
   const [type, setType] = useState<InterviewType>("technical");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
+  const [history, setHistory] = useState<InterviewHistory[]>([]);
+  const [expandedId, setExpandedId] = useState<string[]>([]);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   
+  const fetchHistory = async (autoExpandNewest = false) => {
+    try {
+      const res = await fetch("/api/interview-preparation");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data) {
+          setHistory(json.data);
+          if (json.data.length > 0 && (autoExpandNewest || expandedId.length === 0)) {
+            setExpandedId([json.data[0]._id]);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch history:", error);
+    }
+  };
+
+  const deleteRecord = async (id: string) => {
+    try {
+      const res = await fetch("/api/interview-preparation", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      toast.success("Deleted successfully");
+      await fetchHistory();
+    } catch (err) {
+      toast.error("Failed to delete record");
+    }
+  };
+
   const { submit, isLoading: loading, object, stop } = useObject({
     api: "/api/interview-preparation",
     schema: z.object({
       questions: z.array(z.any()),
     }),
-    onFinish: () => { toast.success("Questions generated!"); },
+    onFinish: () => { 
+      toast.success("Questions generated!"); 
+      setTimeout(() => fetchHistory(true), 1500);
+    },
     onError: (error) => { toast.error(error.message || "Generation failed"); },
   });
 
   const questions = object?.questions || [];
 
   useEffect(() => {
+    fetchHistory();
     fetch("/api/profile")
       .then((res) => res.json())
       .then((json) => {
@@ -310,6 +369,74 @@ export default function InterviewPage() {
           ))}
         </div>
       )}
+
+      {/* Results History */}
+      {history.length > 0 && !loading && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <h2 className="text-xl font-bold text-foreground">Previous Interviews</h2>
+          
+          <Accordion value={expandedId} onValueChange={setExpandedId} className="w-full space-y-4">
+            {history.map((record) => (
+              <AccordionItem key={record._id} value={record._id} className="rounded-2xl border border-border bg-card px-6 shadow-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <AccordionTrigger className="hover:no-underline flex-1 text-left">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 text-left w-full">
+                      <span className="font-semibold text-lg">{record.role}</span>
+                      <div className="flex items-center gap-2">
+                         <Badge className={difficultyColors[record.difficulty]}>{record.difficulty}</Badge>
+                         <Badge className="bg-blue-500/10 text-blue-500 border-0">{record.interviewType}</Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground font-normal">
+                        {new Date(record.createdAt).toLocaleDateString(undefined, {
+                          month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-muted-foreground hover:text-red-500 hover:bg-red-50 shrink-0"
+                    onClick={() => setDeleteId(record._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+                <AccordionContent className="pt-4 pb-6">
+                  <div className="space-y-4">
+                    {record.questions.map((q, i) => (
+                      <QuestionCard key={`${record._id}-${i}`} q={q as any} index={i} type={record.interviewType} />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </motion.div>
+      )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this interview from your history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                if (deleteId) deleteRecord(deleteId);
+                setDeleteId(null);
+              }}
+              className="rounded-xl bg-red-500 hover:bg-red-600 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
