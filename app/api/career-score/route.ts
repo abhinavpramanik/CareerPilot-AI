@@ -7,7 +7,8 @@ import { ResumeAnalysis } from "@/models/ResumeAnalysis";
 import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { careerScorePrompt } from "@/lib/prompts/career-score";
-import { CareerScore, ResumeProfile } from "@/types";
+import { CareerScoreGeminiResponse, ResumeProfile } from "@/types";
+import { calculateCareerScore, CAREER_RUBRIC_VERSION, generateFingerprint } from "@/lib/scoring";
 
 export async function POST() {
   try {
@@ -39,22 +40,39 @@ export async function POST() {
       certifications: resume.certifications,
     };
 
+    const fingerprintString = JSON.stringify(profile);
+    const inputFingerprint = generateFingerprint(fingerprintString);
+
+    const existingReport = await CareerReport.findOne({
+      userId: session.user.id,
+      inputFingerprint,
+      rubricVersion: CAREER_RUBRIC_VERSION,
+    }).sort({ createdAt: -1 });
+
+    if (existingReport) {
+      return NextResponse.json({ success: true, data: existingReport });
+    }
+
     const prompt = careerScorePrompt(profile);
-    const result = (await callGemini(prompt)) as CareerScore;
+    const result = (await callGemini(prompt)) as CareerScoreGeminiResponse;
+
+    const overallScore = calculateCareerScore(result);
 
     const report = await CareerReport.findOneAndUpdate(
       { userId: session.user.id },
       {
         userId: session.user.id,
-        careerScore: result.overallScore,
+        careerScore: overallScore,
         resumeScore: result.resumeScore,
         technicalScore: result.technicalScore,
         projectScore: result.projectScore,
-        communicationScore: result.communicationScore,
+        experienceScore: result.experienceScore,
         interviewScore: result.interviewScore,
         strengths: result.strengths,
         weaknesses: result.weaknesses,
         summary: result.summary,
+        inputFingerprint,
+        rubricVersion: CAREER_RUBRIC_VERSION,
         reportGeneratedAt: new Date(),
       },
       { upsert: true, new: true }

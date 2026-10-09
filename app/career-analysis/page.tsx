@@ -29,7 +29,7 @@ interface CareerScore {
   resumeScore: number;
   technicalScore: number;
   projectScore: number;
-  communicationScore: number;
+  experienceScore: number;
   interviewScore: number;
   strengths: string[];
   weaknesses: string[];
@@ -82,7 +82,7 @@ export default function CareerAnalysisPage() {
         { subject: "Resume", value: data.resumeScore },
         { subject: "Technical", value: data.technicalScore },
         { subject: "Projects", value: data.projectScore },
-        { subject: "Communication", value: data.communicationScore },
+        { subject: "Experience", value: data.experienceScore },
         { subject: "Interview", value: data.interviewScore },
       ]
     : [];
@@ -92,7 +92,7 @@ export default function CareerAnalysisPage() {
         { label: "Resume Quality", value: data.resumeScore, color: "bg-emerald-500" },
         { label: "Technical Skills", value: data.technicalScore, color: "bg-blue-500" },
         { label: "Projects", value: data.projectScore, color: "bg-violet-500" },
-        { label: "Communication", value: data.communicationScore, color: "bg-amber-500" },
+        { label: "Experience", value: data.experienceScore, color: "bg-amber-500" },
         { label: "Interview Readiness", value: data.interviewScore, color: "bg-orange-500" },
       ]
     : [];

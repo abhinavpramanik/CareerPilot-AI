@@ -6,7 +6,7 @@ export interface ICareerReport extends Document {
   resumeScore: number;
   technicalScore: number;
   projectScore: number;
-  communicationScore: number;
+  experienceScore: number;
   interviewScore: number;
   strengths: string[];
   weaknesses: string[];
@@ -19,6 +19,8 @@ export interface ICareerReport extends Document {
     resources: string[];
   }>;
   targetRole?: string;
+  inputFingerprint?: string;
+  rubricVersion?: string;
   reportGeneratedAt: Date;
 }
 
@@ -29,7 +31,7 @@ const CareerReportSchema = new Schema<ICareerReport>(
     resumeScore: { type: Number, default: 0 },
     technicalScore: { type: Number, default: 0 },
     projectScore: { type: Number, default: 0 },
-    communicationScore: { type: Number, default: 0 },
+    experienceScore: { type: Number, default: 0 },
     interviewScore: { type: Number, default: 0 },
     strengths: [String],
     weaknesses: [String],
@@ -44,6 +46,8 @@ const CareerReportSchema = new Schema<ICareerReport>(
       },
     ],
     targetRole: { type: String },
+    inputFingerprint: { type: String },
+    rubricVersion: { type: String },
     reportGeneratedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

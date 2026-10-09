@@ -37,7 +37,18 @@ export interface CareerScore {
   resumeScore: number;
   technicalScore: number;
   projectScore: number;
-  communicationScore: number;
+  experienceScore: number;
+  interviewScore: number;
+  strengths: string[];
+  weaknesses: string[];
+  summary: string;
+}
+
+export interface CareerScoreGeminiResponse {
+  resumeScore: number;
+  technicalScore: number;
+  projectScore: number;
+  experienceScore: number;
   interviewScore: number;
   strengths: string[];
   weaknesses: string[];
@@ -71,6 +82,18 @@ export interface RoadmapResult {
 // ATS Review Types
 export interface ATSResult {
   atsScore: number;
+  keywordIssues: string[];
+  formattingIssues: string[];
+  bulletSuggestions: Array<{ original: string; improved: string }>;
+  overallSuggestions: string[];
+}
+
+export interface ATSGeminiResponse {
+  keywordCoverageScore: number;
+  sectionsCompletenessScore: number;
+  structureParsingScore: number;
+  skillsRelevanceScore: number;
+  achievementImpactScore: number;
   keywordIssues: string[];
   formattingIssues: string[];
   bulletSuggestions: Array<{ original: string; improved: string }>;

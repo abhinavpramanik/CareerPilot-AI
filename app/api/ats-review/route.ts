@@ -8,7 +8,8 @@ import { ATSReview } from "@/models/ATSReview";
 import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { atsPrompt } from "@/lib/prompts/ats-review";
-import { ATSResult } from "@/types";
+import { ATSGeminiResponse } from "@/types";
+import { calculateATSScore, ATS_RUBRIC_VERSION, generateFingerprint } from "@/lib/scoring";
 
 export async function POST() {
   try {
@@ -30,28 +31,50 @@ export async function POST() {
       );
     }
 
+    const inputFingerprint = generateFingerprint(resume.rawText);
+
+    // Check if we can reuse an existing report
+    const existingReview = await ATSReview.findOne({
+      userId: session.user.id,
+      inputFingerprint,
+      rubricVersion: ATS_RUBRIC_VERSION,
+    }).sort({ createdAt: -1 });
+
+    if (existingReview) {
+      return NextResponse.json({ success: true, data: existingReview });
+    }
+
     const prompt = atsPrompt(resume.rawText);
-    const result = (await callGemini(prompt)) as ATSResult;
+    const geminiResult = (await callGemini(prompt)) as ATSGeminiResponse;
+
+    const atsScore = calculateATSScore(geminiResult);
+    
+    const finalResult = {
+      ...geminiResult,
+      atsScore,
+      inputFingerprint,
+      rubricVersion: ATS_RUBRIC_VERSION,
+    };
 
     // Store ATS score in CareerReport for dashboard
     await CareerReport.findOneAndUpdate(
       { userId: session.user.id },
-      { $set: { atsScore: result.atsScore } },
+      { $set: { atsScore: finalResult.atsScore } },
       { upsert: true }
     );
 
     // Save full ATS Review result
-    await ATSReview.findOneAndUpdate(
+    const savedReview = await ATSReview.findOneAndUpdate(
       { userId: session.user.id },
       {
         userId: session.user.id,
-        ...result,
+        ...finalResult,
         generatedAt: new Date(),
       },
       { upsert: true, new: true }
     );
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({ success: true, data: savedReview });
   } catch (error) {
     console.error("ATS review error:", error);
     return NextResponse.json(
