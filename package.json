@@ -16,6 +16,7 @@
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.4.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.25.0",
     "mammoth": "^1.12.0",

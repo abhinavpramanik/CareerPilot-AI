@@ -242,17 +242,19 @@ export default function ResumePage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Skills */}
             {resumeData.skills?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-                    <Code className="h-4 w-4 text-emerald-600" />
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+                      <Code className="h-4 w-4 text-emerald-500" />
+                    </div>
+                    <h3 className="font-semibold text-foreground">Skills</h3>
                   </div>
-                  <h3 className="font-semibold text-foreground">Skills</h3>
-                  <Badge variant="secondary" className="ml-auto">{resumeData.skills.length}</Badge>
+                  <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500">{resumeData.skills.length}</Badge>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {resumeData.skills.map((s) => (
-                    <Badge key={s} className="bg-emerald-50 text-emerald-700 border-0 hover:bg-emerald-100">
+                    <Badge key={s} className="bg-secondary text-foreground hover:bg-secondary/70 font-medium">
                       {s}
                     </Badge>
                   ))}
@@ -262,17 +264,19 @@ export default function ResumePage() {
 
             {/* Technologies */}
             {resumeData.technologies?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
-                    <Sparkles className="h-4 w-4 text-blue-600" />
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+                      <Sparkles className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <h3 className="font-semibold text-foreground">Technologies</h3>
                   </div>
-                  <h3 className="font-semibold text-foreground">Technologies</h3>
-                  <Badge variant="secondary" className="ml-auto">{resumeData.technologies.length}</Badge>
+                  <Badge variant="secondary" className="bg-blue-500/10 text-blue-500">{resumeData.technologies.length}</Badge>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {resumeData.technologies.map((t) => (
-                    <Badge key={t} className="bg-blue-50 text-blue-700 border-0 hover:bg-blue-100">
+                    <Badge key={t} className="bg-secondary text-foreground hover:bg-secondary/70 font-medium">
                       {t}
                     </Badge>
                   ))}
@@ -282,18 +286,18 @@ export default function ResumePage() {
 
             {/* Education */}
             {resumeData.education?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50">
-                    <GraduationCap className="h-4 w-4 text-violet-600" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
+                    <GraduationCap className="h-4 w-4 text-violet-500" />
                   </div>
                   <h3 className="font-semibold text-foreground">Education</h3>
                 </div>
                 <div className="space-y-3">
                   {resumeData.education.map((e, i) => (
-                    <div key={i} className="rounded-xl bg-muted/30 p-3">
-                      <p className="font-medium text-foreground text-sm">{e.institution}</p>
-                      <p className="text-xs text-muted-foreground">{e.degree} in {e.field} — {e.year}</p>
+                    <div key={i} className="rounded-lg border border-border bg-secondary/30 p-4">
+                      <p className="font-semibold text-foreground text-sm">{e.institution}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{e.degree} in {e.field} &bull; {e.year}</p>
                     </div>
                   ))}
                 </div>
@@ -302,18 +306,18 @@ export default function ResumePage() {
 
             {/* Experience */}
             {resumeData.experience?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
                 <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
-                    <Briefcase className="h-4 w-4 text-amber-600" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
+                    <Briefcase className="h-4 w-4 text-amber-500" />
                   </div>
                   <h3 className="font-semibold text-foreground">Experience</h3>
                 </div>
                 <div className="space-y-3">
                   {resumeData.experience.map((e, i) => (
-                    <div key={i} className="rounded-xl bg-muted/30 p-3">
-                      <p className="font-medium text-foreground text-sm">{e.role}</p>
-                      <p className="text-xs text-muted-foreground">{e.company} · {e.duration}</p>
+                    <div key={i} className="rounded-lg border border-border bg-secondary/30 p-4">
+                      <p className="font-semibold text-foreground text-sm">{e.role}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{e.company} &bull; {e.duration}</p>
                     </div>
                   ))}
                 </div>
@@ -323,22 +327,24 @@ export default function ResumePage() {
 
           {/* Projects */}
           {resumeData.projects?.length > 0 && (
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <div className="mb-4 flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-50">
-                  <Trophy className="h-4 w-4 text-orange-600" />
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10">
+                    <Trophy className="h-4 w-4 text-orange-500" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Projects</h3>
                 </div>
-                <h3 className="font-semibold text-foreground">Projects</h3>
-                <Badge variant="secondary" className="ml-auto">{resumeData.projects.length}</Badge>
+                <Badge variant="secondary" className="bg-orange-500/10 text-orange-500">{resumeData.projects.length}</Badge>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2">
                 {resumeData.projects.map((p, i) => (
-                  <div key={i} className="rounded-xl border border-border p-4">
-                    <p className="font-medium text-foreground text-sm mb-1">{p.name}</p>
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{p.description}</p>
-                    <div className="flex flex-wrap gap-1">
+                  <div key={i} className="rounded-xl border border-border bg-secondary/20 p-5">
+                    <p className="font-semibold text-foreground text-sm mb-2">{p.name}</p>
+                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2 leading-relaxed">{p.description}</p>
+                    <div className="flex flex-wrap gap-2">
                       {p.technologies?.slice(0, 4).map((t) => (
-                        <Badge key={t} className="text-[10px] bg-muted border-0 text-muted-foreground">
+                        <Badge key={t} variant="outline" className="text-[10px] font-medium bg-card text-muted-foreground">
                           {t}
                         </Badge>
                       ))}

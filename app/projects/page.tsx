@@ -16,9 +16,9 @@ interface Project {
 }
 
 const difficultyConfig = {
-  Beginner: { class: "bg-emerald-100 text-emerald-700 border-0", dot: "bg-emerald-500", card: "card-mint" },
-  Intermediate: { class: "bg-amber-100 text-amber-700 border-0", dot: "bg-amber-500", card: "card-yellow" },
-  Advanced: { class: "bg-red-100 text-red-700 border-0", dot: "bg-red-500", card: "card-peach" },
+  Beginner: { class: "bg-emerald-500/10 text-emerald-500", dot: "bg-emerald-500", card: "bg-card border border-border" },
+  Intermediate: { class: "bg-amber-500/10 text-amber-500", dot: "bg-amber-500", card: "bg-card border border-border" },
+  Advanced: { class: "bg-red-500/10 text-red-500", dot: "bg-red-500", card: "bg-card border border-border" },
 };
 
 export default function ProjectsPage() {

@@ -26,9 +26,9 @@ interface HRQ {
 }
 
 const difficultyColors: Record<Difficulty, string> = {
-  easy: "bg-emerald-100 text-emerald-700",
-  medium: "bg-amber-100 text-amber-700",
-  hard: "bg-red-100 text-red-700",
+  easy: "bg-emerald-500/10 text-emerald-500",
+  medium: "bg-amber-500/10 text-amber-500",
+  hard: "bg-red-500/10 text-red-500",
 };
 
 function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; type: InterviewType }) {
@@ -86,7 +86,7 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {tech.keyConcepts.map((c) => (
-                          <Badge key={c} className="bg-blue-50 text-blue-700 border-0 text-[11px]">{c}</Badge>
+                          <Badge key={c} className="bg-blue-500/10 text-blue-500 border-0 text-[11px]">{c}</Badge>
                         ))}
                       </div>
                     </div>
@@ -115,17 +115,17 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
                     </p>
                     <p className="text-sm text-muted-foreground leading-relaxed">{hr.sampleAnswer}</p>
                   </div>
-                  <div className="rounded-xl bg-violet-50 border border-violet-100 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-600 mb-1.5">
+                  <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 p-4">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-500 mb-1.5">
                       STAR Method Guidance
                     </p>
                     <p className="text-xs text-muted-foreground">{hr.starGuidance}</p>
                   </div>
                   {hr.personalizationTip && (
-                    <div className="rounded-xl bg-amber-50 border border-amber-100 p-4">
+                    <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
                       <div className="flex items-center gap-1.5 mb-1.5">
                         <Star className="h-3 w-3 text-amber-500" />
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-600">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-500">
                           Personalization Tip
                         </p>
                       </div>
@@ -264,7 +264,7 @@ export default function InterviewPage() {
           <div className="flex items-center gap-3">
             <h3 className="font-semibold text-foreground">{questions.length} Questions</h3>
             <Badge className={difficultyColors[difficulty]}>{difficulty}</Badge>
-            <Badge className="bg-blue-50 text-blue-700 border-0">{type}</Badge>
+            <Badge className="bg-blue-500/10 text-blue-500 border-0">{type}</Badge>
           </div>
           {questions.map((q, i) => (
             <QuestionCard key={i} q={q} index={i} type={type} />

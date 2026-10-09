@@ -24,9 +24,9 @@ interface ATSResult {
 }
 
 const scoreLabel = (score: number) => {
-  if (score >= 80) return { label: "ATS Friendly", color: "text-emerald-600", bg: "bg-emerald-50" };
-  if (score >= 60) return { label: "Needs Improvement", color: "text-amber-600", bg: "bg-amber-50" };
-  return { label: "ATS Risk", color: "text-red-600", bg: "bg-red-50" };
+  if (score >= 80) return { label: "ATS Friendly", color: "text-emerald-500", bg: "bg-emerald-500/10" };
+  if (score >= 60) return { label: "Needs Improvement", color: "text-amber-500", bg: "bg-amber-500/10" };
+  return { label: "ATS Risk", color: "text-red-500", bg: "bg-red-500/10" };
 };
 
 export default function ATSReviewPage() {
@@ -142,17 +142,19 @@ export default function ATSReviewPage() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* Keyword Issues */}
             {data.keywordIssues?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  <h3 className="font-semibold text-foreground">Missing Keywords</h3>
-                  <Badge variant="secondary" className="ml-auto">{data.keywordIssues.length}</Badge>
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    <h3 className="font-semibold text-foreground">Missing Keywords</h3>
+                  </div>
+                  <Badge variant="secondary" className="bg-amber-500/10 text-amber-500">{data.keywordIssues.length}</Badge>
                 </div>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {data.keywordIssues.map((k, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
-                      {k}
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground bg-secondary/30 p-2.5 rounded-lg border border-border">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                      <span>{k}</span>
                     </li>
                   ))}
                 </ul>
@@ -161,17 +163,19 @@ export default function ATSReviewPage() {
 
             {/* Formatting Issues */}
             {data.formattingIssues?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-red-500" />
-                  <h3 className="font-semibold text-foreground">Formatting Issues</h3>
-                  <Badge variant="secondary" className="ml-auto">{data.formattingIssues.length}</Badge>
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                    <h3 className="font-semibold text-foreground">Formatting Issues</h3>
+                  </div>
+                  <Badge variant="secondary" className="bg-red-500/10 text-red-500">{data.formattingIssues.length}</Badge>
                 </div>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {data.formattingIssues.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
-                      {f}
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground bg-secondary/30 p-2.5 rounded-lg border border-border">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                      <span>{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -186,15 +190,17 @@ export default function ATSReviewPage() {
               <div className="space-y-4">
                 {data.bulletSuggestions.map((b, i) => (
                   <div key={i} className="rounded-xl border border-border overflow-hidden">
-                    <div className="flex items-start gap-3 p-4 bg-red-50/50">
-                      <span className="text-xs font-semibold text-red-500 shrink-0 mt-0.5 uppercase">Before</span>
+                    <div className="flex items-start gap-3 p-4 bg-red-500/5">
+                      <span className="text-[10px] font-bold text-red-500 shrink-0 mt-0.5 uppercase tracking-wider bg-red-500/10 px-2 py-0.5 rounded">Before</span>
                       <p className="text-sm text-muted-foreground">{b.original}</p>
                     </div>
-                    <div className="flex items-center gap-2 px-4">
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex items-center justify-center -my-3 relative z-10">
+                      <div className="bg-card border border-border rounded-full p-1 shadow-sm">
+                        <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                      </div>
                     </div>
-                    <div className="flex items-start gap-3 p-4 bg-emerald-50/50">
-                      <span className="text-xs font-semibold text-emerald-600 shrink-0 mt-0.5 uppercase">After</span>
+                    <div className="flex items-start gap-3 p-4 bg-emerald-500/5">
+                      <span className="text-[10px] font-bold text-emerald-500 shrink-0 mt-0.5 uppercase tracking-wider bg-emerald-500/10 px-2 py-0.5 rounded">After</span>
                       <p className="text-sm text-foreground font-medium">{b.improved}</p>
                     </div>
                   </div>

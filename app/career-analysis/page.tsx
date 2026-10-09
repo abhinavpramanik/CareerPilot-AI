@@ -37,9 +37,9 @@ interface CareerScore {
 }
 
 const scoreLabel = (score: number) => {
-  if (score >= 85) return { label: "Excellent", color: "text-emerald-600" };
-  if (score >= 70) return { label: "Good", color: "text-blue-600" };
-  if (score >= 55) return { label: "Fair", color: "text-amber-600" };
+  if (score >= 85) return { label: "Excellent", color: "text-emerald-500" };
+  if (score >= 70) return { label: "Good", color: "text-blue-500" };
+  if (score >= 55) return { label: "Fair", color: "text-amber-500" };
   return { label: "Needs Work", color: "text-red-500" };
 };
 
@@ -212,18 +212,18 @@ export default function CareerAnalysisPage() {
           {/* Strengths & Weaknesses */}
           <div className="grid gap-6 md:grid-cols-2">
             {data.strengths?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
-                    <TrendingUp className="h-4 w-4 text-emerald-600" />
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+                    <TrendingUp className="h-4 w-4 text-emerald-500" />
                   </div>
                   <h3 className="font-semibold text-foreground">Strengths</h3>
                 </div>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {data.strengths.map((s, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-                      {s}
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground bg-secondary/30 p-2.5 rounded-lg border border-border">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                      <span>{s}</span>
                     </li>
                   ))}
                 </ul>
@@ -231,18 +231,18 @@ export default function CareerAnalysisPage() {
             )}
 
             {data.weaknesses?.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50">
+              <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
                     <TrendingDown className="h-4 w-4 text-red-500" />
                   </div>
                   <h3 className="font-semibold text-foreground">Areas to Improve</h3>
                 </div>
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {data.weaknesses.map((w, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
-                      {w}
+                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground bg-secondary/30 p-2.5 rounded-lg border border-border">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                      <span>{w}</span>
                     </li>
                   ))}
                 </ul>

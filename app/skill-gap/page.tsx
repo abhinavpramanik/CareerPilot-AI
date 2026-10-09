@@ -36,9 +36,9 @@ interface SkillGapHistory {
 }
 
 const priorityConfig = {
-  High: { class: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" },
-  Medium: { class: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" },
-  Low: { class: "bg-emerald-100 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  High: { class: "bg-red-500/10 text-red-500 border-red-500/20", dot: "bg-red-500" },
+  Medium: { class: "bg-amber-500/10 text-amber-500 border-amber-500/20", dot: "bg-amber-500" },
+  Low: { class: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", dot: "bg-emerald-500" },
 };
 
 export default function SkillGapPage() {
@@ -208,9 +208,9 @@ export default function SkillGapPage() {
                       {/* Summary */}
                       <div className="grid grid-cols-3 gap-4">
                         {[
-                          { label: "High Priority", count: highCount, class: "card-peach", textColor: "text-red-600" },
-                          { label: "Medium Priority", count: medCount, class: "card-yellow", textColor: "text-amber-600" },
-                          { label: "Low Priority", count: lowCount, class: "card-mint", textColor: "text-emerald-600" },
+                          { label: "High Priority", count: highCount, class: "bg-red-500/10 border border-red-500/20", textColor: "text-red-500" },
+                          { label: "Medium Priority", count: medCount, class: "bg-amber-500/10 border border-amber-500/20", textColor: "text-amber-500" },
+                          { label: "Low Priority", count: lowCount, class: "bg-emerald-500/10 border border-emerald-500/20", textColor: "text-emerald-500" },
                         ].map((s) => (
                           <div key={s.label} className={`rounded-xl p-4 text-center ${s.class}`}>
                             <p className={`text-2xl font-bold ${s.textColor}`}>{s.count}</p>
