@@ -10,6 +10,13 @@ import { ResumeAnalysis } from "@/models/ResumeAnalysis";
 import { callGemini } from "@/lib/gemini";
 import { roadmapPrompt } from "@/lib/prompts/roadmap";
 import { RoadmapResult, ResumeProfile } from "@/types";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamObject } from "ai";
+import { z } from "zod";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,15 +56,36 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = roadmapPrompt(targetRole, missingSkills, profile);
-    const result = (await callGemini(prompt)) as RoadmapResult;
 
-    const roadmap = await Roadmap.create({
-      userId: session.user.id,
-      targetRole,
-      weeks: result.weeks,
+    const schema = z.object({
+      weeks: z.array(z.object({
+        week: z.number(),
+        topics: z.array(z.string()),
+        deliverables: z.array(z.string()),
+        estimatedHours: z.number(),
+      })),
     });
 
-    return NextResponse.json({ success: true, data: roadmap });
+    const result = await streamObject({
+      model: google("gemini-flash-lite-latest"),
+      schema,
+      prompt,
+      onFinish: async ({ object }) => {
+        if (object?.weeks) {
+          try {
+            await Roadmap.create({
+              userId: session.user.id,
+              targetRole,
+              weeks: object.weeks,
+            });
+          } catch (e) {
+            console.error("Error saving streamed roadmap:", e);
+          }
+        }
+      },
+    });
+
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("Roadmap error:", error);
     return NextResponse.json(

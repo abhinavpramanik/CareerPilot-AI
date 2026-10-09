@@ -18,6 +18,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { experimental_useObject as useObject } from "@ai-sdk/react";
+import { z } from "zod";
 
 const ROLE_SUGGESTIONS = [
   "Full Stack Developer",
@@ -47,10 +49,10 @@ interface RoadmapHistory {
 
 export default function RoadmapPage() {
   const [role, setRole] = useState("");
-  const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<RoadmapHistory[]>([]);
   const [expandedId, setExpandedId] = useState<string[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showStream, setShowStream] = useState(false);
 
   const fetchHistory = async (autoExpandNewest = false) => {
     try {
@@ -84,6 +86,22 @@ export default function RoadmapPage() {
     }
   };
 
+  const { submit, isLoading: loading, object, stop } = useObject({
+    api: "/api/roadmap",
+    schema: z.object({
+      weeks: z.array(z.any()),
+    }),
+    onFinish: () => {
+      toast.success("Roadmap generated!");
+      setTimeout(() => {
+        fetchHistory(true).then(() => setShowStream(false));
+      }, 1500);
+    },
+    onError: (error) => { toast.error(error.message || "Failed to generate roadmap"); },
+  });
+
+  const streamingWeeks = object?.weeks || [];
+
   useEffect(() => {
     fetchHistory();
     fetch("/api/profile")
@@ -96,24 +114,10 @@ export default function RoadmapPage() {
       .catch((err) => console.error("Failed to load profile target role", err));
   }, []);
 
-  const generate = async () => {
+  const generate = () => {
     if (!role.trim()) { toast.error("Please enter a target role"); return; }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/roadmap", { 
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetRole: role }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-      toast.success("Roadmap generated!");
-      await fetchHistory(true);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to generate roadmap");
-    } finally {
-      setLoading(false);
-    }
+    setShowStream(true);
+    submit({ targetRole: role });
   };
 
   return (
@@ -163,9 +167,14 @@ export default function RoadmapPage() {
             </button>
           ))}
         </div>
+        {loading && (
+          <Button variant="outline" onClick={stop} className="w-full rounded-xl gap-2 mt-4">
+            Stop Generation
+          </Button>
+        )}
       </div>
 
-      {loading && (
+      {loading && streamingWeeks.length === 0 && (
         <div className="rounded-2xl border border-border bg-card p-12 text-center">
           <div className="flex flex-col items-center gap-4">
             <div className="relative flex h-16 w-16 items-center justify-center">
@@ -179,7 +188,7 @@ export default function RoadmapPage() {
         </div>
       )}
 
-      {!history.length && !loading && (
+      {!history.length && !showStream && (
         <div className="rounded-3xl border-2 border-dashed border-border p-16 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
             <Map className="h-8 w-8 text-muted-foreground" />
@@ -191,7 +200,81 @@ export default function RoadmapPage() {
         </div>
       )}
 
-      {history.length > 0 && !loading && (
+      {/* Streaming Roadmap View */}
+      {showStream && streamingWeeks.length > 0 && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-foreground">Your Roadmap</h2>
+            <Badge className="bg-primary/10 text-primary border-0">{streamingWeeks.length} weeks</Badge>
+          </div>
+          
+          <div className="relative">
+            <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-border hidden md:block" />
+
+            <div className="space-y-6">
+              {streamingWeeks.map((week, i) => {
+                const w = (week || {}) as RoadmapWeek;
+                const topics = w.topics || [];
+                const deliverables = w.deliverables || [];
+                return (
+                  <div key={i} className="md:pl-16 relative">
+                    <div className="absolute left-3.5 top-5 hidden h-5 w-5 items-center justify-center rounded-full border-2 border-primary bg-card md:flex">
+                      <span className="text-[9px] font-bold text-primary">{w.week || i + 1}</span>
+                    </div>
+
+                    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Badge className="bg-primary/10 text-primary border-0">Week {w.week || i + 1}</Badge>
+                          <span className="text-sm font-semibold text-foreground">
+                            {topics[0] || "Generating..."}
+                            {topics.length > 1 && ` + ${topics.length - 1} more`}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          {w.estimatedHours || 0}h
+                        </div>
+                      </div>
+
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div>
+                          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                            Topics
+                          </p>
+                          <ul className="space-y-1.5">
+                            {topics.map((topic, j) => (
+                              <li key={j} className="flex items-start gap-2 text-sm text-foreground">
+                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                                {topic}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                            Deliverables
+                          </p>
+                          <ul className="space-y-1.5">
+                            {deliverables.map((d, j) => (
+                              <li key={j} className="flex items-start gap-2 text-sm text-foreground">
+                                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                                {d}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {history.length > 0 && !showStream && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <h2 className="text-xl font-bold text-foreground">Previous Roadmaps</h2>
           <Accordion value={expandedId} onValueChange={setExpandedId} className="w-full space-y-4">

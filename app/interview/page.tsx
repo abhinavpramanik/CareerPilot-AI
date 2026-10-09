@@ -183,6 +183,7 @@ export default function InterviewPage() {
   const [history, setHistory] = useState<InterviewHistory[]>([]);
   const [expandedId, setExpandedId] = useState<string[]>([]);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showStream, setShowStream] = useState(false);
   
   const fetchHistory = async (autoExpandNewest = false) => {
     try {
@@ -223,7 +224,9 @@ export default function InterviewPage() {
     }),
     onFinish: () => { 
       toast.success("Questions generated!"); 
-      setTimeout(() => fetchHistory(true), 1500);
+      setTimeout(() => {
+        fetchHistory(true).then(() => setShowStream(false));
+      }, 1500);
     },
     onError: (error) => { toast.error(error.message || "Generation failed"); },
   });
@@ -244,6 +247,7 @@ export default function InterviewPage() {
 
   const generate = () => {
     if (!role.trim()) { toast.error("Please enter a target role"); return; }
+    setShowStream(true);
     submit({ role, interviewType: type, difficulty });
   };
 
@@ -357,7 +361,7 @@ export default function InterviewPage() {
       )}
 
       {/* Questions */}
-      {questions.length > 0 && (
+      {showStream && questions.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <h3 className="font-semibold text-foreground">{questions.length} Questions</h3>
@@ -371,7 +375,7 @@ export default function InterviewPage() {
       )}
 
       {/* Results History */}
-      {history.length > 0 && !loading && (
+      {history.length > 0 && !showStream && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
           <h2 className="text-xl font-bold text-foreground">Previous Interviews</h2>
           
