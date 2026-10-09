@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
@@ -57,8 +58,8 @@ export function Sidebar({ user }: SidebarProps) {
   const SidebarContent = () => (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-primary">
-          <Sparkles className="h-4 w-4 text-primary-foreground" />
+        <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded">
+          <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={32} height={32} className="h-full w-full object-cover" />
         </div>
         <span className="text-lg font-bold text-foreground tracking-tight">CareerPilot AI</span>
       </div>
@@ -180,8 +181,8 @@ export function MobileNav({ user }: SidebarProps) {
   return (
     <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
       <div className="flex items-center gap-2">
-        <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
-          <Sparkles className="h-3 w-3 text-primary-foreground" />
+        <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded">
+          <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={28} height={28} className="h-full w-full object-cover" />
         </div>
         <span className="text-base font-bold text-foreground tracking-tight">CareerPilot</span>
       </div>

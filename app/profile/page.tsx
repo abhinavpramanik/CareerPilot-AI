@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -308,9 +309,9 @@ function OnboardingContent() {
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-            className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary shadow-lg shadow-primary/30"
+            className="mx-auto mb-8 flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl shadow-lg shadow-primary/30"
           >
-            <Sparkles className="h-10 w-10 text-white" />
+            <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={96} height={96} className="h-full w-full object-cover" />
           </motion.div>
 
           <motion.h1

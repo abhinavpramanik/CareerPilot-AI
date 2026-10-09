@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Globe, Zap, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 const perks = [
   "AI resume analysis in seconds",
@@ -63,8 +64,8 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="relative flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white/20 backdrop-blur border border-white/30 shadow-xl">
+            <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={40} height={40} className="h-full w-full object-cover" />
           </div>
           <span className="text-xl font-bold text-white">CareerPilot AI</span>
         </div>
@@ -111,8 +112,8 @@ export default function LoginPage() {
         >
           {/* Mobile logo */}
           <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary">
-              <Sparkles className="h-4 w-4 text-white" />
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl">
+              <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={32} height={32} className="h-full w-full object-cover" />
             </div>
             <span className="text-lg font-bold text-foreground">CareerPilot AI</span>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Brain,
@@ -92,8 +93,8 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-primary">
-              <Sparkles className="h-4 w-4 text-primary-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded">
+              <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={32} height={32} className="h-full w-full object-cover" />
             </div>
             <span className="text-lg font-bold text-foreground tracking-tight">CareerPilot AI</span>
           </div>
@@ -444,8 +445,8 @@ export default function LandingPage() {
       <footer className="border-t border-border bg-background">
         <div className="mx-auto max-w-7xl px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-primary">
-              <Sparkles className="h-3 w-3 text-primary-foreground" />
+            <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded">
+              <Image src="/CareerPilot_icon.png" alt="CareerPilot Logo" width={24} height={24} className="h-full w-full object-cover" />
             </div>
             <span className="font-semibold text-foreground tracking-tight">CareerPilot AI</span>
           </div>
