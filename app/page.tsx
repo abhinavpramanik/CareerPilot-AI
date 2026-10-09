@@ -182,55 +182,26 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="relative lg:ml-auto w-full max-w-lg"
+              className="relative lg:ml-auto w-full max-w-2xl"
             >
               {/* Decorative background blur */}
-              <div className="absolute -inset-4 bg-primary/10 rounded-[2rem] blur-2xl opacity-50 dark:opacity-20 pointer-events-none"></div>
+              <div className="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-3xl opacity-50 dark:opacity-30 pointer-events-none"></div>
               
-              <div className="relative rounded-2xl border border-border bg-card/80 backdrop-blur-xl shadow-2xl p-6">
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
-                  <div>
-                    <h3 className="font-semibold text-foreground">Career Readiness</h3>
-                    <p className="text-xs text-muted-foreground">Target Role: Software Engineer</p>
-                  </div>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/15">Strong Match</Badge>
-                </div>
-                
-                <div className="flex items-end gap-4 mb-8">
-                  <div className="text-6xl font-bold tracking-tighter text-foreground">84<span className="text-2xl text-muted-foreground font-normal">/100</span></div>
-                  <div className="pb-2 text-sm font-medium text-emerald-500 flex items-center gap-1">
-                    <TrendingUpIcon className="h-4 w-4" /> Top 15%
-                  </div>
-                </div>
-
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1.5">
-                      <span className="text-muted-foreground">Technical Skills</span>
-                      <span className="font-medium text-foreground">92/100</span>
-                    </div>
-                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                      <div className="h-full bg-primary rounded-full" style={{ width: '92%' }}></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1.5">
-                      <span className="text-muted-foreground">Projects & Experience</span>
-                      <span className="font-medium text-foreground">78/100</span>
-                    </div>
-                    <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-500 rounded-full" style={{ width: '78%' }}></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-secondary/50 p-4 border border-border">
-                  <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Priority Action
-                  </p>
-                  <p className="text-sm text-muted-foreground">Your resume lacks cloud computing keywords (AWS, Docker). Consider completing the recommended <span className="text-foreground font-medium underline decoration-primary/30 underline-offset-2">Serverless API Project</span> to bridge this gap.</p>
-                </div>
-              </div>
+              <motion.div
+                animate={{ y: [0, -15, 0] }}
+                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                className="relative z-10 w-full"
+              >
+                <Image 
+                  src="/Hero_section_Img.png" 
+                  alt="CareerPilot AI Dashboard Preview" 
+                  width={1000} 
+                  height={1000} 
+                  className="w-full h-auto drop-shadow-2xl pointer-events-none select-none object-contain"
+                  draggable={false}
+                  priority
+                />
+              </motion.div>
             </motion.div>
           </div>
         </div>
