@@ -14,6 +14,7 @@ export interface IATSReview extends Document {
   overallSuggestions: string[];
   inputFingerprint: string;
   rubricVersion: string;
+  targetRole?: string;
   generatedAt: Date;
 }
 
@@ -40,6 +41,7 @@ const ATSReviewSchema = new Schema<IATSReview>(
     overallSuggestions: { type: [String], default: [] },
     inputFingerprint: { type: String },
     rubricVersion: { type: String },
+    targetRole: { type: String },
     generatedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

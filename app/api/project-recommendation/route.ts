@@ -9,6 +9,7 @@ import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { projectPrompt } from "@/lib/prompts/project";
 import { ProjectRecommendationResult, ResumeProfile } from "@/types";
+import { ProjectGeminiResponseSchema, validateAIOutput } from "@/lib/validation";
 
 export async function POST() {
   try {
@@ -43,9 +44,20 @@ export async function POST() {
 
     const targetRole = report?.targetRole ?? "Software Developer";
     const prompt = projectPrompt(profile, targetRole);
-    const result = (await callGemini(prompt)) as ProjectRecommendationResult;
+    const rawResult = await callGemini(prompt);
 
-    // Save full Project Recommendation result
+    // Validate AI output before persisting
+    const validation = validateAIOutput(ProjectGeminiResponseSchema, rawResult);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "AI returned an unexpected response format. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    const result = validation.data;
+
+    // Save full Project Recommendation result — only after validation
     await ProjectRecommendation.findOneAndUpdate(
       { userId: session.user.id },
       {

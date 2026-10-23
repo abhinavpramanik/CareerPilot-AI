@@ -38,6 +38,10 @@ interface RoadmapWeek {
   topics: string[];
   deliverables: string[];
   estimatedHours: number;
+  resources?: string[];
+  prerequisites?: string[];
+  targetSkill?: string;
+  completed?: boolean;
 }
 
 interface RoadmapHistory {
@@ -83,6 +87,37 @@ export default function RoadmapPage() {
       await fetchHistory();
     } catch (err) {
       toast.error("Failed to delete record");
+    }
+  };
+
+  const toggleComplete = async (roadmapId: string, weekNumber: number, currentStatus?: boolean) => {
+    try {
+      const res = await fetch("/api/roadmap", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: roadmapId,
+          weekNumber,
+          completed: !currentStatus,
+        }),
+      });
+      if (res.ok) {
+        setHistory((prev) =>
+          prev.map((r) =>
+            r._id === roadmapId
+              ? {
+                  ...r,
+                  weeks: r.weeks.map((w) =>
+                    w.week === weekNumber ? { ...w, completed: !currentStatus } : w
+                  ),
+                }
+              : r
+          )
+        );
+        toast.success(`Week ${weekNumber} ${!currentStatus ? "completed!" : "marked in-progress"}`);
+      }
+    } catch {
+      toast.error("Failed to update step status");
     }
   };
 
@@ -330,18 +365,38 @@ export default function RoadmapPage() {
                                 <span className="text-[9px] font-bold text-primary">{week.week}</span>
                               </div>
 
-                              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
-                                <div className="mb-4 flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <Badge className="bg-primary/10 text-primary border-0">Week {week.week}</Badge>
+                              <div className={`rounded-2xl border ${week.completed ? "border-emerald-500/30 bg-emerald-500/5" : "border-border bg-card"} p-6 shadow-sm hover:shadow-md transition-shadow`}>
+                                <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <Badge className={`${week.completed ? "bg-emerald-500/20 text-emerald-600" : "bg-primary/10 text-primary"} border-0`}>
+                                      Week {week.week}
+                                    </Badge>
+                                    {week.targetSkill && (
+                                      <Badge variant="outline" className="text-xs">
+                                        Target: {week.targetSkill}
+                                      </Badge>
+                                    )}
                                     <span className="text-sm font-semibold text-foreground">
                                       {week.topics[0] && week.topics[0]}
                                       {week.topics.length > 1 && ` + ${week.topics.length - 1} more`}
                                     </span>
                                   </div>
-                                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                    <Clock className="h-3.5 w-3.5" />
-                                    {week.estimatedHours}h
+                                  <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                      <Clock className="h-3.5 w-3.5" />
+                                      {week.estimatedHours}h
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant={week.completed ? "default" : "outline"}
+                                      className={`h-7 px-2.5 text-xs rounded-full gap-1 ${
+                                        week.completed ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""
+                                      }`}
+                                      onClick={() => toggleComplete(record._id, week.week, week.completed)}
+                                    >
+                                      <CheckCircle2 className="h-3.5 w-3.5" />
+                                      {week.completed ? "Done" : "Mark Complete"}
+                                    </Button>
                                   </div>
                                 </div>
 
@@ -358,6 +413,22 @@ export default function RoadmapPage() {
                                         </li>
                                       ))}
                                     </ul>
+
+                                    {/* Prerequisites */}
+                                    {week.prerequisites && week.prerequisites.length > 0 && (
+                                      <div className="mt-3 pt-3 border-t border-border/50">
+                                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+                                          Prerequisites
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                          {week.prerequisites.map((p, k) => (
+                                            <span key={k} className="text-[10px] bg-muted/80 px-2 py-0.5 rounded text-foreground/80">
+                                              {p}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                   <div>
                                     <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -371,6 +442,29 @@ export default function RoadmapPage() {
                                         </li>
                                       ))}
                                     </ul>
+
+                                    {/* Curated Resources */}
+                                    {week.resources && week.resources.length > 0 && (
+                                      <div className="mt-3 pt-3 border-t border-border/50">
+                                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+                                          Curated Learning Resources
+                                        </p>
+                                        <ul className="space-y-1">
+                                          {week.resources.map((r, k) => (
+                                            <li key={k} className="text-xs text-primary flex items-center gap-1.5">
+                                              <span className="h-1 w-1 rounded-full bg-primary" />
+                                              {r.startsWith("http") ? (
+                                                <a href={r} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                                  {r}
+                                                </a>
+                                              ) : (
+                                                <span>{r}</span>
+                                              )}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </div>

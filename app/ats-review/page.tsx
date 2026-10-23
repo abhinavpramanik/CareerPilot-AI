@@ -9,6 +9,7 @@ import {
   RefreshCw,
   AlertTriangle,
   ArrowRight,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +18,17 @@ import { toast } from "sonner";
 
 interface ATSResult {
   atsScore: number;
+  keywordCoverageScore?: number;
+  sectionsCompletenessScore?: number;
+  structureParsingScore?: number;
+  skillsRelevanceScore?: number;
+  achievementImpactScore?: number;
   keywordIssues: string[];
   formattingIssues: string[];
   bulletSuggestions: Array<{ original: string; improved: string }>;
   overallSuggestions: string[];
+  targetRole?: string;
+  rubricVersion?: string;
 }
 
 const scoreLabel = (score: number) => {
@@ -137,6 +145,82 @@ export default function ATSReviewPage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Rubric Component Breakdown */}
+          {data.keywordCoverageScore !== undefined && (
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">ATS Rubric Breakdown</h3>
+                  <p className="text-xs text-muted-foreground">
+                    Deterministic score calculated from 5 weighted evaluation dimensions
+                    {data.targetRole ? ` for "${data.targetRole}"` : ""}.
+                  </p>
+                </div>
+                {data.rubricVersion && (
+                  <Badge variant="outline" className="text-xs">
+                    v{data.rubricVersion}
+                  </Badge>
+                )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                {[
+                  {
+                    name: "Keyword Match",
+                    weight: "35%",
+                    score: data.keywordCoverageScore,
+                  },
+                  {
+                    name: "Section Completeness",
+                    weight: "20%",
+                    score: data.sectionsCompletenessScore ?? 0,
+                  },
+                  {
+                    name: "Structure & Parsing",
+                    weight: "15%",
+                    score: data.structureParsingScore ?? 0,
+                  },
+                  {
+                    name: "Skills Relevance",
+                    weight: "15%",
+                    score: data.skillsRelevanceScore ?? 0,
+                  },
+                  {
+                    name: "Achievement Impact",
+                    weight: "15%",
+                    score: data.achievementImpactScore ?? 0,
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.name}
+                    className="rounded-xl border border-border/60 bg-muted/20 p-3.5 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                        <span className="font-medium">{item.name}</span>
+                        <span className="text-[10px] opacity-75">{item.weight}</span>
+                      </div>
+                      <div className="flex items-baseline gap-1 my-1">
+                        <span className="text-2xl font-bold text-foreground">
+                          {item.score !== undefined ? item.score : "N/A"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">/100</span>
+                      </div>
+                    </div>
+                    <Progress value={item.score ?? 0} className="h-1.5 mt-2" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ATS Disclaimer */}
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
+            <Info className="h-4 w-4 shrink-0 text-muted-foreground mt-0.5" />
+            <p>
+              <strong>Rubric-Based Estimate:</strong> This score is CareerPilot AI&apos;s objective compatibility audit based on standardized parsing heuristics and target role criteria. It is designed to optimize resume machine readability and does not guarantee proprietary ATS outcomes.
+            </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">

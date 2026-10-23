@@ -13,6 +13,25 @@ export interface IInterviewPrep extends Document {
     sampleAnswer?: string;
     starGuidance?: string;
     personalizationTip?: string;
+    topic?: string;
+    userAnswer?: string;
+    evaluation?: {
+      score: number;
+      correctnessScore: number;
+      reasoningScore: number;
+      clarityScore: number;
+      coverageScore: number;
+      feedback: string;
+      strengths: string[];
+      improvements: string[];
+      rubricVersion: string;
+      evaluatedAt: Date;
+    };
+    adaptiveRecommendation?: {
+      nextDifficulty: "easy" | "medium" | "hard";
+      action: "advance" | "maintain" | "reinforce";
+      reason: string;
+    };
   }>;
   createdAt: Date;
 }
@@ -36,6 +55,25 @@ const InterviewPrepSchema = new Schema<IInterviewPrep>(
         sampleAnswer: String,
         starGuidance: String,
         personalizationTip: String,
+        topic: String,
+        userAnswer: String,
+        evaluation: {
+          score: Number,
+          correctnessScore: Number,
+          reasoningScore: Number,
+          clarityScore: Number,
+          coverageScore: Number,
+          feedback: String,
+          strengths: [String],
+          improvements: [String],
+          rubricVersion: String,
+          evaluatedAt: { type: Date, default: Date.now },
+        },
+        adaptiveRecommendation: {
+          nextDifficulty: { type: String, enum: ["easy", "medium", "hard"] },
+          action: { type: String, enum: ["advance", "maintain", "reinforce"] },
+          reason: String,
+        },
       },
     ],
   },

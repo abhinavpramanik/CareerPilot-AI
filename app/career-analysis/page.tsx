@@ -10,6 +10,7 @@ import {
   TrendingUp,
   TrendingDown,
   RefreshCw,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +35,8 @@ interface CareerScore {
   strengths: string[];
   weaknesses: string[];
   summary: string;
+  rubricVersion?: string;
+  targetRole?: string;
 }
 
 const scoreLabel = (score: number) => {
@@ -89,11 +92,11 @@ export default function CareerAnalysisPage() {
 
   const metrics = data
     ? [
-        { label: "Resume Quality", value: data.resumeScore, color: "bg-emerald-500" },
-        { label: "Technical Skills", value: data.technicalScore, color: "bg-blue-500" },
-        { label: "Projects", value: data.projectScore, color: "bg-violet-500" },
-        { label: "Experience", value: data.experienceScore, color: "bg-amber-500" },
-        { label: "Interview Readiness", value: data.interviewScore, color: "bg-orange-500" },
+        { label: "Technical Skills", weight: "30%", value: data.technicalScore, color: "bg-blue-500" },
+        { label: "Projects & Practical Application", weight: "25%", value: data.projectScore, color: "bg-violet-500" },
+        { label: "Relevant Experience", weight: "15%", value: data.experienceScore, color: "bg-amber-500" },
+        { label: "Resume Quality", weight: "15%", value: data.resumeScore, color: "bg-emerald-500" },
+        { label: "Interview Preparation Readiness", weight: "15%", value: data.interviewScore, color: "bg-orange-500" },
       ]
     : [];
 
@@ -188,7 +191,19 @@ export default function CareerAnalysisPage() {
 
           {/* Score Breakdown */}
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h3 className="mb-5 font-semibold text-foreground">Score Breakdown</h3>
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-foreground">Score Breakdown</h3>
+                <p className="text-xs text-muted-foreground">
+                  Weighted 5-dimension rubric evaluating readiness for technical industry standards.
+                </p>
+              </div>
+              {data.rubricVersion && (
+                <Badge variant="outline" className="text-xs">
+                  Rubric v{data.rubricVersion}
+                </Badge>
+              )}
+            </div>
             <div className="space-y-4">
               {metrics.map((m, i) => (
                 <motion.div
@@ -198,7 +213,9 @@ export default function CareerAnalysisPage() {
                   transition={{ delay: i * 0.08 }}
                 >
                   <div className="mb-1.5 flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground">{m.label}</span>
+                    <span className="text-sm font-medium text-foreground">
+                      {m.label} <span className="text-xs font-normal text-muted-foreground">({m.weight})</span>
+                    </span>
                     <span className={`text-sm font-bold ${scoreLabel(m.value).color}`}>
                       {m.value}/100
                     </span>

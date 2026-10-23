@@ -8,6 +8,10 @@ export interface IRoadmap extends Document {
     topics: string[];
     deliverables: string[];
     estimatedHours: number;
+    resources?: string[];
+    prerequisites?: string[];
+    targetSkill?: string;
+    completed?: boolean;
   }>;
   generatedAt: Date;
 }
@@ -22,6 +26,10 @@ const RoadmapSchema = new Schema<IRoadmap>(
         topics: [String],
         deliverables: [String],
         estimatedHours: Number,
+        resources: { type: [String], default: [] },
+        prerequisites: { type: [String], default: [] },
+        targetSkill: String,
+        completed: { type: Boolean, default: false },
       },
     ],
     generatedAt: { type: Date, default: Date.now },

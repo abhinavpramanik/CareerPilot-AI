@@ -7,6 +7,7 @@ import { ResumeAnalysis } from "@/models/ResumeAnalysis";
 import { callGemini } from "@/lib/gemini";
 import { resumePrompt } from "@/lib/prompts/resume";
 import { ResumeProfile } from "@/types";
+import { ResumeGeminiResponseSchema, validateAIOutput } from "@/lib/validation";
 // Polyfills for pdfjs-dist in Node.js environments (like Vercel serverless functions)
 if (typeof global.DOMMatrix === "undefined") {
   (global as any).DOMMatrix = class DOMMatrix {};
@@ -115,9 +116,20 @@ export async function POST(req: NextRequest) {
 
     // Call Gemini to parse
     const prompt = resumePrompt(rawText.trim());
-    const parsed = (await callGemini(prompt)) as ResumeProfile;
+    const rawParsed = await callGemini(prompt);
 
-    // Save to DB
+    // Validate AI output before persisting
+    const validation = validateAIOutput(ResumeGeminiResponseSchema, rawParsed);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "AI returned an unexpected response format. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    const parsed = validation.data;
+
+    // Save to DB — only after validation succeeds
     await connectDB();
     const analysis = await ResumeAnalysis.findOneAndUpdate(
       { userId: session.user.id },

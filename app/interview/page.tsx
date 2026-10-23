@@ -2,10 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Sparkles, Loader2, ChevronDown, ChevronUp, Star, Trash2 } from "lucide-react";
+import {
+  Mic,
+  Sparkles,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Star,
+  Trash2,
+  CheckCircle2,
+  TrendingUp,
+  Award,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
@@ -65,11 +77,76 @@ const difficultyColors: Record<Difficulty, string> = {
   hard: "bg-red-500/10 text-red-500",
 };
 
-function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; type: InterviewType }) {
+interface QuestionCardProps {
+  q: any;
+  index: number;
+  type: InterviewType;
+  sessionId?: string;
+  role?: string;
+  difficulty?: Difficulty;
+}
+
+function QuestionCard({
+  q,
+  index,
+  type,
+  sessionId,
+  role = "Software Developer",
+  difficulty = "medium",
+}: QuestionCardProps) {
   const [open, setOpen] = useState(false);
+  const [answerText, setAnswerText] = useState(q?.userAnswer || "");
+  const [evaluating, setEvaluating] = useState(false);
+  const [evaluation, setEvaluation] = useState<any>(q?.evaluation || null);
+  const [adaptive, setAdaptive] = useState<any>(q?.adaptiveRecommendation || null);
+  const [showAnswerKey, setShowAnswerKey] = useState(Boolean(q?.evaluation));
+
   const isTech = type === "technical";
   const tech = (q || {}) as TechnicalQ;
   const hr = (q || {}) as HRQ;
+
+  const handleEvaluate = async () => {
+    if (!answerText.trim()) {
+      toast.error("Please type your response before submitting.");
+      return;
+    }
+
+    setEvaluating(true);
+    try {
+      const res = await fetch("/api/interview-preparation/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          questionIndex: index,
+          question: q.question,
+          userAnswer: answerText,
+          role,
+          interviewType: type,
+          expectedCriteria: isTech ? tech.expectedAnswer : hr.sampleAnswer,
+          difficulty,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error);
+
+      setEvaluation(json.data.evaluation);
+      setAdaptive(json.data.adaptiveRecommendation);
+      setShowAnswerKey(true);
+      toast.success("Answer evaluated against rubric!");
+    } catch (err: any) {
+      toast.error(err?.message || "Evaluation failed");
+    } finally {
+      setEvaluating(false);
+    }
+  };
+
+  const scoreBadge = (score: number) => {
+    if (score >= 80) return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
+    if (score >= 55) return "bg-amber-500/10 text-amber-500 border-amber-500/20";
+    return "bg-red-500/10 text-red-500 border-red-500/20";
+  };
 
   return (
     <motion.div
@@ -86,7 +163,14 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
           <span className="mt-0.5 text-xs font-bold text-primary shrink-0 bg-primary/10 rounded-full h-6 w-6 flex items-center justify-center">
             {index + 1}
           </span>
-          <p className="text-sm font-medium text-foreground leading-relaxed">{q?.question || "Generating question..."}</p>
+          <div>
+            <p className="text-sm font-medium text-foreground leading-relaxed">{q?.question || "Generating question..."}</p>
+            {evaluation && (
+              <span className="text-[10px] text-emerald-600 font-semibold mt-1 inline-flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Assessed: {evaluation.score}/100
+              </span>
+            )}
+          </div>
         </div>
         {open ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
@@ -104,69 +188,203 @@ function QuestionCard({ q, index, type }: { q: TechnicalQ | HRQ; index: number; 
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-border px-5 pb-5 pt-4 space-y-4">
-              {isTech ? (
-                <>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
-                      Expected Answer
-                    </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{tech.expectedAnswer}</p>
+            <div className="border-t border-border px-5 pb-5 pt-4 space-y-5">
+              {/* Practice Answer Box */}
+              {!evaluation && (
+                <div className="space-y-3 rounded-xl border border-border bg-muted/20 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold text-foreground">Practice Your Answer</p>
+                    <span className="text-[10px] text-muted-foreground">Rubric v1.0.0</span>
                   </div>
-                  {tech.keyConcepts?.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
-                        Key Concepts
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {tech.keyConcepts.map((c) => (
-                          <Badge key={c} className="bg-blue-500/10 text-blue-500 border-0 text-[11px]">{c}</Badge>
-                        ))}
+                  <textarea
+                    value={answerText}
+                    onChange={(e) => setAnswerText(e.target.value)}
+                    placeholder="Type your explanation or response here. Mention your approach, key principles, tradeoffs, or STAR scenario..."
+                    rows={4}
+                    className="w-full rounded-xl border border-border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    <Button
+                      size="sm"
+                      disabled={evaluating || !answerText.trim()}
+                      onClick={handleEvaluate}
+                      className="rounded-xl bg-primary text-white text-xs gap-1.5 shadow-sm"
+                    >
+                      {evaluating ? (
+                        <><Loader2 className="h-3.5 w-3.5 animate-spin" />Evaluating Rubric...</>
+                      ) : (
+                        <><Sparkles className="h-3.5 w-3.5" />Submit for AI Assessment</>
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowAnswerKey(!showAnswerKey)}
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      {showAnswerKey ? "Hide Answer Key" : "Peek at Answer Key"}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Assessment Results */}
+              {evaluation && (
+                <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Award className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-foreground text-sm">Assessment Feedback</span>
+                    </div>
+                    <Badge className={`text-xs px-2.5 py-0.5 border ${scoreBadge(evaluation.score)}`}>
+                      Rubric Score: {evaluation.score}/100
+                    </Badge>
+                  </div>
+
+                  {/* 4 Rubric Dimensions */}
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    {[
+                      { name: "Correctness", weight: "40%", score: evaluation.correctnessScore },
+                      { name: "Reasoning Depth", weight: "25%", score: evaluation.reasoningScore },
+                      { name: "Clarity", weight: "20%", score: evaluation.clarityScore },
+                      { name: "Coverage", weight: "15%", score: evaluation.coverageScore },
+                    ].map((dim) => (
+                      <div key={dim.name} className="rounded-lg bg-muted/30 border border-border/50 p-2.5">
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                          <span>{dim.name}</span>
+                          <span className="opacity-75">{dim.weight}</span>
+                        </div>
+                        <p className="text-lg font-bold text-foreground">{dim.score}<span className="text-xs text-muted-foreground font-normal">/100</span></p>
+                        <Progress value={dim.score} className="h-1 mt-1.5" />
                       </div>
-                    </div>
-                  )}
-                  {tech.followUps?.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
-                        Follow-up Questions
-                      </p>
-                      <ul className="space-y-1">
-                        {tech.followUps.map((f, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                            <span className="mt-1.5 h-1 w-1 rounded-full bg-muted-foreground shrink-0" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
-                      Sample Answer
-                    </p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{hr.sampleAnswer || "Generating answer..."}</p>
+                    ))}
                   </div>
-                  <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 p-4">
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-500 mb-1.5">
-                      STAR Method Guidance
-                    </p>
-                    <p className="text-xs text-muted-foreground">{hr.starGuidance || "Generating guidance..."}</p>
+
+                  {/* Summary Feedback */}
+                  <p className="text-xs text-muted-foreground leading-relaxed bg-muted/20 p-3 rounded-lg">
+                    {evaluation.feedback}
+                  </p>
+
+                  {/* Strengths & Improvements */}
+                  <div className="grid gap-3 sm:grid-cols-2 text-xs">
+                    {evaluation.strengths?.length > 0 && (
+                      <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/20 p-3">
+                        <p className="font-semibold text-emerald-600 mb-1.5">Demonstrated Strengths</p>
+                        <ul className="space-y-1 text-muted-foreground">
+                          {evaluation.strengths.map((s: string, i: number) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="h-1 w-1 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {evaluation.improvements?.length > 0 && (
+                      <div className="rounded-lg bg-amber-500/5 border border-amber-500/20 p-3">
+                        <p className="font-semibold text-amber-600 mb-1.5">Areas to Polish</p>
+                        <ul className="space-y-1 text-muted-foreground">
+                          {evaluation.improvements.map((im: string, i: number) => (
+                            <li key={i} className="flex items-start gap-1.5">
+                              <span className="h-1 w-1 rounded-full bg-amber-500 mt-1.5 shrink-0" />
+                              <span>{im}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                  {hr.personalizationTip && (
-                    <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        <Star className="h-3 w-3 text-amber-500" />
-                        <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-500">
-                          Personalization Tip
+
+                  {/* Adaptive Recommendation */}
+                  {adaptive && (
+                    <div className="flex items-start gap-2.5 rounded-lg border border-primary/20 bg-primary/5 p-3 text-xs">
+                      <TrendingUp className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-foreground">
+                          Adaptive Progression: Next Difficulty &rarr; <span className="uppercase text-primary font-bold">{adaptive.nextDifficulty}</span> ({adaptive.action})
                         </p>
+                        <p className="text-muted-foreground mt-0.5">{adaptive.reason}</p>
                       </div>
-                      <p className="text-xs text-muted-foreground">{hr.personalizationTip}</p>
                     </div>
                   )}
-                </>
+
+                  {/* Sample Better Answer */}
+                  {evaluation.sampleBetterAnswer && (
+                    <div className="rounded-lg border border-border bg-muted/10 p-3 text-xs">
+                      <p className="font-semibold text-foreground mb-1">Exemplary Answer</p>
+                      <p className="text-muted-foreground leading-relaxed">{evaluation.sampleBetterAnswer}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Expected answer key & guidance */}
+              {showAnswerKey && (
+                <div className="space-y-4 pt-2 border-t border-border/50">
+                  {isTech ? (
+                    <>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                          Expected Answer Criteria
+                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{tech.expectedAnswer}</p>
+                      </div>
+                      {tech.keyConcepts?.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                            Key Concepts
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {tech.keyConcepts.map((c) => (
+                              <Badge key={c} className="bg-blue-500/10 text-blue-500 border-0 text-[11px]">{c}</Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {tech.followUps?.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                            Follow-up Questions
+                          </p>
+                          <ul className="space-y-1">
+                            {tech.followUps.map((f, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                                <span className="mt-1.5 h-1 w-1 rounded-full bg-muted-foreground shrink-0" />
+                                {f}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                          Sample Answer
+                        </p>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{hr.sampleAnswer || "Generating answer..."}</p>
+                      </div>
+                      <div className="rounded-xl bg-violet-500/10 border border-violet-500/20 p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-500 mb-1.5">
+                          STAR Method Guidance
+                        </p>
+                        <p className="text-xs text-muted-foreground">{hr.starGuidance || "Generating guidance..."}</p>
+                      </div>
+                      {hr.personalizationTip && (
+                        <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <Star className="h-3 w-3 text-amber-500" />
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-amber-500">
+                              Personalization Tip
+                            </p>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{hr.personalizationTip}</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               )}
             </div>
           </motion.div>
@@ -369,7 +587,7 @@ export default function InterviewPage() {
             <Badge className="bg-blue-500/10 text-blue-500 border-0">{type}</Badge>
           </div>
           {questions.map((q, i) => (
-            <QuestionCard key={i} q={q} index={i} type={type} />
+            <QuestionCard key={i} q={q} index={i} type={type} role={role} difficulty={difficulty} />
           ))}
         </div>
       )}
@@ -409,7 +627,15 @@ export default function InterviewPage() {
                 <AccordionContent className="pt-4 pb-6">
                   <div className="space-y-4">
                     {record.questions.map((q, i) => (
-                      <QuestionCard key={`${record._id}-${i}`} q={q as any} index={i} type={record.interviewType} />
+                      <QuestionCard
+                        key={`${record._id}-${i}`}
+                        q={q as any}
+                        index={i}
+                        type={record.interviewType}
+                        sessionId={record._id}
+                        role={record.role}
+                        difficulty={record.difficulty}
+                      />
                     ))}
                   </div>
                 </AccordionContent>

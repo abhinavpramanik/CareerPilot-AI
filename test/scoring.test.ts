@@ -103,3 +103,48 @@ test('Input fingerprinting logic works', () => {
   const fp3 = generateFingerprint("user2_resume_text");
   assert.notStrictEqual(fp1, fp3);
 });
+
+test('Scores stay within 0-100 range for all combinations', () => {
+  // All zeros
+  const allZero = calculateATSScore({
+    keywordCoverageScore: 0,
+    sectionsCompletenessScore: 0,
+    structureParsingScore: 0,
+    skillsRelevanceScore: 0,
+    achievementImpactScore: 0,
+  });
+  assert.strictEqual(allZero, 0);
+
+  // All perfect
+  const allMax = calculateATSScore({
+    keywordCoverageScore: 100,
+    sectionsCompletenessScore: 100,
+    structureParsingScore: 100,
+    skillsRelevanceScore: 100,
+    achievementImpactScore: 100,
+  });
+  assert.strictEqual(allMax, 100);
+
+  // Boundary values are clamped
+  const clamped = calculateATSScore({
+    keywordCoverageScore: -50,
+    sectionsCompletenessScore: 200,
+    structureParsingScore: 50,
+    skillsRelevanceScore: 50,
+    achievementImpactScore: 50,
+  });
+  assert.ok(clamped >= 0 && clamped <= 100, `Score ${clamped} should be between 0 and 100`);
+});
+
+test('Fingerprint changes when resume content changes', () => {
+  const fp1 = generateFingerprint("Original resume text with experience in React");
+  const fp2 = generateFingerprint("Original resume text with experience in React and Node.js");
+  assert.notStrictEqual(fp1, fp2, "Different resume text should produce different fingerprints");
+});
+
+test('Rubric versions are defined and non-empty', () => {
+  assert.ok(ATS_RUBRIC_VERSION, "ATS rubric version should be defined");
+  assert.ok(ATS_RUBRIC_VERSION.length > 0, "ATS rubric version should be non-empty");
+  assert.ok(CAREER_RUBRIC_VERSION, "Career rubric version should be defined");
+  assert.ok(CAREER_RUBRIC_VERSION.length > 0, "Career rubric version should be non-empty");
+});

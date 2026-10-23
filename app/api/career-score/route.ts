@@ -7,8 +7,16 @@ import { ResumeAnalysis } from "@/models/ResumeAnalysis";
 import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { careerScorePrompt } from "@/lib/prompts/career-score";
-import { CareerScoreGeminiResponse, ResumeProfile } from "@/types";
+import { ResumeProfile } from "@/types";
 import { calculateCareerScore, CAREER_RUBRIC_VERSION, generateFingerprint } from "@/lib/scoring";
+import { CareerScoreGeminiResponseSchema, validateAIOutput } from "@/lib/validation";
+
+/**
+ * In-memory concurrency guard.
+ * Prevents duplicate Gemini calls for the same user + fingerprint + rubric
+ * while an earlier request is still in flight.
+ */
+const inFlightRequests = new Map<string, Promise<unknown>>();
 
 export async function POST() {
   try {
@@ -53,38 +61,78 @@ export async function POST() {
       return NextResponse.json({ success: true, data: existingReport });
     }
 
-    const prompt = careerScorePrompt(profile);
-    const result = (await callGemini(prompt)) as CareerScoreGeminiResponse;
+    // Concurrency guard: reuse in-progress generation for same inputs
+    const concurrencyKey = `career:${session.user.id}:${inputFingerprint}:${CAREER_RUBRIC_VERSION}`;
+    if (inFlightRequests.has(concurrencyKey)) {
+      try {
+        await inFlightRequests.get(concurrencyKey);
+        // Re-check DB after the in-flight request completes
+        const completedReport = await CareerReport.findOne({
+          userId: session.user.id,
+          inputFingerprint,
+          rubricVersion: CAREER_RUBRIC_VERSION,
+        }).sort({ createdAt: -1 });
+        if (completedReport) {
+          return NextResponse.json({ success: true, data: completedReport });
+        }
+      } catch {
+        // The in-flight request failed — we'll proceed with a new attempt
+      }
+    }
 
-    const overallScore = calculateCareerScore(result);
+    // Run the generation, guarded for concurrency
+    const generationPromise = (async () => {
+      const prompt = careerScorePrompt(profile);
+      const geminiResult = await callGemini(prompt);
 
-    const report = await CareerReport.findOneAndUpdate(
-      { userId: session.user.id },
-      {
-        userId: session.user.id,
-        careerScore: overallScore,
-        resumeScore: result.resumeScore,
-        technicalScore: result.technicalScore,
-        projectScore: result.projectScore,
-        experienceScore: result.experienceScore,
-        interviewScore: result.interviewScore,
-        strengths: result.strengths,
-        weaknesses: result.weaknesses,
-        summary: result.summary,
-        inputFingerprint,
-        rubricVersion: CAREER_RUBRIC_VERSION,
-        reportGeneratedAt: new Date(),
-      },
-      { upsert: true, new: true }
-    );
+      // Validate AI output before scoring
+      const validation = validateAIOutput(CareerScoreGeminiResponseSchema, geminiResult);
+      if (!validation.success) {
+        throw new Error(validation.error);
+      }
 
-    return NextResponse.json({ success: true, data: report });
-  } catch (error) {
+      const result = validation.data;
+      const overallScore = calculateCareerScore(result);
+
+      const report = await CareerReport.findOneAndUpdate(
+        { userId: session.user.id },
+        {
+          userId: session.user.id,
+          careerScore: overallScore,
+          resumeScore: result.resumeScore,
+          technicalScore: result.technicalScore,
+          projectScore: result.projectScore,
+          experienceScore: result.experienceScore,
+          interviewScore: result.interviewScore,
+          strengths: result.strengths,
+          weaknesses: result.weaknesses,
+          summary: result.summary,
+          inputFingerprint,
+          rubricVersion: CAREER_RUBRIC_VERSION,
+          reportGeneratedAt: new Date(),
+        },
+        { upsert: true, new: true }
+      );
+
+      return report;
+    })();
+
+    inFlightRequests.set(concurrencyKey, generationPromise);
+
+    try {
+      const report = await generationPromise;
+      return NextResponse.json({ success: true, data: report });
+    } finally {
+      inFlightRequests.delete(concurrencyKey);
+    }
+  } catch (error: any) {
     console.error("Career score error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate career score. Please try again." },
-      { status: 500 }
-    );
+
+    const message = error?.message?.startsWith("AI output validation failed")
+      ? "AI returned an unexpected response format. Please try again."
+      : "Failed to generate career score. Please try again.";
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

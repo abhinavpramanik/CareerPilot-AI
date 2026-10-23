@@ -9,6 +9,9 @@ import { CareerReport } from "@/models/CareerReport";
 import { callGemini } from "@/lib/gemini";
 import { skillGapPrompt } from "@/lib/prompts/skill-gap";
 import { SkillGapResult, ResumeProfile } from "@/types";
+import { SkillGapGeminiResponseSchema, validateAIOutput } from "@/lib/validation";
+import { retrieveKnowledgeChunks, formatRetrievedContext } from "@/lib/knowledge/retrieval";
+import { verifyCitations } from "@/lib/knowledge/citations";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,8 +48,43 @@ export async function POST(req: NextRequest) {
       certifications: resume.certifications,
     };
 
-    const prompt = skillGapPrompt(profile, targetRole);
-    const result = (await callGemini(prompt)) as SkillGapResult;
+    // Retrieve curated knowledge chunks grounded in targetRole and user skills
+    const retrievedChunks = await retrieveKnowledgeChunks({
+      targetRole,
+      skills: profile.skills,
+      contentTypes: ["role_competency", "skill_prerequisite", "learning_resource"],
+      limit: 4,
+    });
+    const retrievedEvidence = formatRetrievedContext(retrievedChunks);
+
+    const prompt = skillGapPrompt(profile, targetRole, retrievedEvidence);
+    const rawResult = await callGemini(prompt);
+
+    // Validate AI output before persisting
+    const validation = validateAIOutput(SkillGapGeminiResponseSchema, rawResult);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: "AI returned an unexpected response format. Please try again." },
+        { status: 500 }
+      );
+    }
+
+    const result = validation.data;
+
+    // Verify citations against actually retrieved knowledge chunks
+    const candidateCitations = result.missingSkills
+      .map((s) => s.citationChunkId)
+      .filter((c): c is string => Boolean(c));
+    const verified = verifyCitations(candidateCitations, retrievedChunks);
+
+    // Strip any hallucinated citation IDs
+    const sanitizedMissingSkills = result.missingSkills.map((s) => ({
+      ...s,
+      citationChunkId:
+        s.citationChunkId && verified.validCitations.includes(s.citationChunkId)
+          ? s.citationChunkId
+          : undefined,
+    }));
 
     // Update career report targetRole for consistency in other features
     await CareerReport.findOneAndUpdate(
@@ -55,14 +93,20 @@ export async function POST(req: NextRequest) {
       { upsert: true }
     );
 
-    // Save as a new SkillGap record for history
+    // Save as a new SkillGap record for history — only after validation
     const skillGapRecord = await SkillGap.create({
       userId: session.user.id,
       targetRole,
-      missingSkills: result.missingSkills,
+      missingSkills: sanitizedMissingSkills,
     });
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({
+      success: true,
+      data: {
+        missingSkills: sanitizedMissingSkills,
+        retrievedSources: verified.resolvedSources,
+      },
+    });
   } catch (error) {
     console.error("Skill gap error:", error);
     return NextResponse.json(

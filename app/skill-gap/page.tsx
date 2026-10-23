@@ -36,6 +36,12 @@ interface MissingSkill {
   priority: "High" | "Medium" | "Low";
   reason: string;
   resources: string[];
+  candidateEvidence?: string;
+  knowledgeBaseEvidence?: string;
+  confidence?: "Demonstrated" | "Mentioned Without Evidence" | "Not Found In Profile" | "Unassessed";
+  suggestedPractice?: string;
+  prerequisites?: string[];
+  citationChunkId?: string;
 }
 
 interface SkillGapHistory {
@@ -230,6 +236,14 @@ export default function SkillGapPage() {
                         ))}
                       </div>
 
+                      {/* Evidence Disclaimer */}
+                      <div className="rounded-xl border border-border/80 bg-muted/30 p-3.5 text-xs text-muted-foreground flex items-start gap-2.5">
+                        <span className="text-sm">ℹ️</span>
+                        <p>
+                          <strong>Evidence-Backed Assessment:</strong> &quot;Not Found In Profile&quot; indicates that evidence was not detected in your uploaded resume, rather than a lack of capability. You can add projects or certifications to your resume to demonstrate these skills.
+                        </p>
+                      </div>
+
                       {/* Skills */}
                       <div className="space-y-4">
                         {(["High", "Medium", "Low"] as const).map((priority) => {
@@ -248,12 +262,50 @@ export default function SkillGapPage() {
                                     className="rounded-xl border border-border bg-card p-4 shadow-sm"
                                   >
                                     <div className="mb-3 flex items-start justify-between">
-                                      <h4 className="font-semibold text-foreground">{skill.name}</h4>
-                                      <Badge className={`shrink-0 ml-2 border text-[10px] ${priorityConfig[priority].class}`}>
-                                        {priority}
-                                      </Badge>
+                                      <div>
+                                        <h4 className="font-semibold text-foreground">{skill.name}</h4>
+                                        {skill.confidence && (
+                                          <span className="text-[10px] text-muted-foreground font-normal block mt-0.5">
+                                            Status: {skill.confidence}
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                        {skill.citationChunkId && (
+                                          <Badge variant="outline" className="text-[9px] px-1.5 py-0 border-blue-500/30 text-blue-500 bg-blue-500/5">
+                                            Verified KB
+                                          </Badge>
+                                        )}
+                                        <Badge className={`border text-[10px] ${priorityConfig[priority].class}`}>
+                                          {priority}
+                                        </Badge>
+                                      </div>
                                     </div>
                                     <p className="text-sm text-muted-foreground mb-3">{skill.reason}</p>
+
+                                    {/* Prerequisites */}
+                                    {skill.prerequisites && skill.prerequisites.length > 0 && (
+                                      <div className="mb-3">
+                                        <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                                          Prerequisites
+                                        </p>
+                                        <div className="flex flex-wrap gap-1">
+                                          {skill.prerequisites.map((p, k) => (
+                                            <span key={k} className="text-[10px] bg-muted/80 px-2 py-0.5 rounded text-foreground/80">
+                                              {p}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Suggested Practice */}
+                                    {skill.suggestedPractice && (
+                                      <div className="mb-3 rounded-lg bg-primary/5 border border-primary/15 p-2.5 text-xs text-muted-foreground">
+                                        <strong className="text-foreground">Suggested Practice:</strong> {skill.suggestedPractice}
+                                      </div>
+                                    )}
+
                                     {skill.resources?.length > 0 && (
                                       <div>
                                         <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1.5">

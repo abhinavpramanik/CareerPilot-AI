@@ -65,18 +65,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
-        
+
         // When a user logs in, we need to check if they have filled their profile.
         // For Credentials login, we already fetched the user, but for Google we might not have.
         // It's safest to do a quick DB check here to populate isOnboarded.
         await connectDB();
-        
+
         let dbUser = null;
         // If the ID is a valid MongoDB ObjectId (from Credentials login)
         if (user.id && user.id.match(/^[0-9a-fA-F]{24}$/)) {
           dbUser = await User.findById(user.id);
         }
-        
+
         // If not found by ID (Google login), search by email
         if (!dbUser && user.email) {
           dbUser = await User.findOne({ email: user.email });

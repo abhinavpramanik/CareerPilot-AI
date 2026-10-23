@@ -14,6 +14,8 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { streamObject } from "ai";
 import { z } from "zod";
 
+import { retrieveKnowledgeChunks, formatRetrievedContext } from "@/lib/knowledge/retrieval";
+
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -55,13 +57,25 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    const prompt = roadmapPrompt(targetRole, missingSkills, profile);
+    // Retrieve curated prerequisite knowledge and resources
+    const retrievedChunks = await retrieveKnowledgeChunks({
+      targetRole,
+      skills: profile?.skills || [],
+      contentTypes: ["skill_prerequisite", "role_competency", "learning_resource"],
+      limit: 4,
+    });
+    const retrievedEvidence = formatRetrievedContext(retrievedChunks);
+
+    const prompt = roadmapPrompt(targetRole, missingSkills, profile, retrievedEvidence);
 
     const schema = z.object({
       weeks: z.array(z.object({
         week: z.number(),
+        targetSkill: z.string().optional(),
         topics: z.array(z.string()),
         deliverables: z.array(z.string()),
+        prerequisites: z.array(z.string()).optional(),
+        resources: z.array(z.string()).optional(),
         estimatedHours: z.number(),
       })),
     });
@@ -135,5 +149,42 @@ export async function DELETE(req: NextRequest) {
   } catch (error) {
     console.error("Error deleting roadmap:", error);
     return NextResponse.json({ error: "Failed to delete roadmap data" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, weekNumber, completed } = await req.json();
+    if (!id || weekNumber === undefined) {
+      return NextResponse.json(
+        { error: "id and weekNumber are required" },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+    const roadmap = await Roadmap.findOne({ _id: id, userId: session.user.id });
+    if (!roadmap) {
+      return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
+    }
+
+    const weekItem = roadmap.weeks.find((w: any) => w.week === weekNumber);
+    if (weekItem) {
+      weekItem.completed = Boolean(completed);
+      await roadmap.save();
+    }
+
+    return NextResponse.json({ success: true, data: roadmap });
+  } catch (error) {
+    console.error("Error updating roadmap step:", error);
+    return NextResponse.json(
+      { error: "Failed to update roadmap step" },
+      { status: 500 }
+    );
   }
 }
