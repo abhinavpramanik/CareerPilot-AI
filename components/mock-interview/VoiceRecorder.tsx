@@ -235,9 +235,9 @@ export function VoiceRecorder({ onTranscribe, disabled = false }: VoiceRecorderP
   // Transcribing state
   if (state === "transcribing") {
     return (
-      <div className="flex items-center gap-2.5 rounded-xl border border-primary/30 bg-primary/[0.06] px-3.5 py-2 text-xs text-primary shadow-xs">
-        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-        <span className="font-medium">Converting speech to text & removing filler words...</span>
+      <div className="flex items-center gap-2.5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs sm:text-sm font-medium text-primary shadow-xs">
+        <Loader2 className="h-4 w-4 animate-spin text-primary shrink-0" />
+        <span>Transcribing speech & removing filler words...</span>
       </div>
     );
   }
@@ -245,14 +245,14 @@ export function VoiceRecorder({ onTranscribe, disabled = false }: VoiceRecorderP
   // Active recording state
   if (state === "recording") {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.05] p-3 shadow-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-500/[0.08] p-3 sm:px-4 shadow-sm w-full sm:w-auto">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-3 w-3 items-center justify-center">
+          <div className="relative flex h-3.5 w-3.5 items-center justify-center">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
           </div>
 
-          <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-red-500">
+          <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-red-500">
             <span>Recording</span>
             <span>•</span>
             <span>{formatTime(duration)}</span>
@@ -276,7 +276,7 @@ export function VoiceRecorder({ onTranscribe, disabled = false }: VoiceRecorderP
             type="button"
             size="sm"
             onClick={stopRecording}
-            className="h-8 gap-1.5 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 shadow-xs"
+            className="h-9 gap-1.5 rounded-xl bg-emerald-600 px-3.5 text-xs font-semibold text-white hover:bg-emerald-700 shadow-sm transition-all"
           >
             <Square className="h-3 w-3 fill-current" /> Stop & Transcribe
           </Button>
@@ -286,7 +286,7 @@ export function VoiceRecorder({ onTranscribe, disabled = false }: VoiceRecorderP
             size="sm"
             variant="ghost"
             onClick={cancelRecording}
-            className="h-8 w-8 rounded-lg p-0 text-muted-foreground hover:bg-red-500/10 hover:text-red-500"
+            className="h-9 w-9 rounded-xl p-0 text-muted-foreground hover:bg-red-500/10 hover:text-red-500"
             title="Cancel recording"
           >
             <X className="h-4 w-4" />
@@ -296,23 +296,21 @@ export function VoiceRecorder({ onTranscribe, disabled = false }: VoiceRecorderP
     );
   }
 
-  // Idle state
+  // Idle state — prominent and eye-catching
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        onClick={startRecording}
-        disabled={disabled}
-        className="h-8 gap-1.5 rounded-lg border-primary/30 bg-primary/5 px-3 text-xs font-medium text-primary hover:bg-primary/10 transition-colors shadow-2xs"
-      >
-        <Mic className="h-3.5 w-3.5 text-primary" />
-        <span>Record Answer</span>
-        <span className="hidden sm:inline-flex items-center gap-0.5 rounded-full bg-primary/15 px-1.5 py-0.2 text-[10px] font-semibold text-primary">
-          <Sparkles className="h-2.5 w-2.5" /> AI Clean
-        </span>
-      </Button>
-    </div>
+    <Button
+      type="button"
+      onClick={startRecording}
+      disabled={disabled}
+      className="h-10 px-4 rounded-xl gap-2 font-semibold text-xs sm:text-sm bg-primary text-white hover:bg-primary/90 shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 transition-all shrink-0"
+    >
+      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-white shrink-0">
+        <Mic className="h-3 w-3" />
+      </div>
+      <span>Record Answer</span>
+      <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-medium tracking-wide">
+        <Sparkles className="h-2.5 w-2.5" /> AI Clean
+      </span>
+    </Button>
   );
 }

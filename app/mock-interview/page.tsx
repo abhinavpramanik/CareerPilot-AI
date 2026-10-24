@@ -26,6 +26,7 @@ import {
   Maximize2,
   Minimize2,
   AlertTriangle,
+  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -101,16 +102,12 @@ interface MockReport {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const ROLE_SUGGESTIONS = [
-  "Full Stack Developer",
+const POPULAR_ROLES = [
   "Frontend Developer",
   "Backend Developer",
+  "Full Stack Developer",
   "Data Scientist",
-  "Machine Learning Engineer",
   "DevOps Engineer",
-  "Android Developer",
-  "iOS Developer",
-  "Cybersecurity Analyst",
 ];
 
 const difficultyColors: Record<Difficulty, string> = {
@@ -165,7 +162,9 @@ interface SetupStageProps {
   starting: boolean;
   history: MockReport[];
   onViewReport: (r: MockReport) => void;
-  onDeleteHistory: (id: string) => void;
+  onRequestDelete: (id: string) => void;
+  timerEnabled: boolean;
+  setTimerEnabled: (v: boolean) => void;
 }
 
 function SetupStage({
@@ -179,54 +178,56 @@ function SetupStage({
   starting,
   history,
   onViewReport,
-  onDeleteHistory,
+  onRequestDelete,
+  timerEnabled,
+  setTimerEnabled,
 }: SetupStageProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shadow-sm shrink-0">
-            <Video className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Mock Interview</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Simulate a real interview, answer questions one-by-one, and get a detailed AI evaluation report.
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 shadow-xs shrink-0">
+          <Video className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">Mock Interview</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Real interview simulation with voice answers, fullscreen proctoring, and comprehensive AI evaluation.
+          </p>
         </div>
       </div>
 
-      {/* Config Card */}
-      <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="border-b border-border/60 pb-4">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" /> Configure Your Session
+      {/* Config Card - Minimalist */}
+      <div className="rounded-2xl border border-border/70 bg-card p-5 sm:p-7 shadow-xs space-y-5">
+        <div className="border-b border-border/50 pb-3.5">
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-primary" /> Session Settings
           </h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Select your target specialization, interview format, and difficulty to generate tailored questions.
+            Configure your target job role, interview focus, and difficulty level.
           </p>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Target Role</label>
+        {/* Target Role with compact suggestions */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Target Role</label>
           <Input
-            placeholder="e.g. Full Stack Developer, Data Scientist, DevOps Engineer"
+            placeholder="e.g. Frontend Developer, Full Stack, Data Scientist..."
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            className="h-11 rounded-xl bg-background"
+            className="h-10 rounded-xl bg-background text-sm"
           />
-          <div className="pt-1 flex flex-wrap gap-2">
-            {ROLE_SUGGESTIONS.map((r) => (
+          <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-muted-foreground">
+            <span className="text-[11px] text-muted-foreground font-medium">Popular:</span>
+            {POPULAR_ROLES.map((r) => (
               <button
                 key={r}
                 type="button"
                 onClick={() => setRole(r)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                className={`rounded-lg px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                   role === r
-                    ? "border-primary bg-primary/15 text-primary shadow-sm"
-                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-muted/20"
+                    ? "bg-primary text-white shadow-2xs"
+                    : "bg-muted/40 text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                 }`}
               >
                 {r}
@@ -235,38 +236,39 @@ function SetupStage({
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Interview Type</label>
-            <div className="grid grid-cols-2 gap-2.5">
+        {/* Type & Difficulty Segmented Selectors */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Interview Type</label>
+            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full">
               {(["technical", "hr"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setType(t)}
-                  className={`rounded-xl border py-3 px-3 text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
                     type === t
-                      ? "border-primary bg-primary text-white shadow-sm"
-                      : "border-border text-muted-foreground hover:border-primary/40 bg-muted/10 hover:text-foreground"
+                      ? "bg-background text-foreground shadow-xs border border-border/40"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {t === "technical" ? "🖥 Technical" : "👥 HR / Behavioral"}
+                  {t === "technical" ? "Technical Focus" : "HR & Behavioral"}
                 </button>
               ))}
             </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Difficulty</label>
-            <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Difficulty Level</label>
+            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full">
               {(["easy", "medium", "hard"] as const).map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => setDifficulty(d)}
-                  className={`rounded-xl border py-3 text-sm font-medium capitalize transition-all text-center ${
+                  className={`flex-1 py-2 text-xs font-semibold capitalize rounded-lg transition-all ${
                     difficulty === d
-                      ? "border-primary bg-primary text-white shadow-sm"
-                      : "border-border text-muted-foreground hover:border-primary/40 bg-muted/10 hover:text-foreground"
+                      ? "bg-background text-foreground shadow-xs border border-border/40"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {d}
@@ -276,35 +278,58 @@ function SetupStage({
           </div>
         </div>
 
-        {/* Guidelines */}
-        <div className="rounded-xl border border-primary/20 bg-primary/[0.03] p-5 space-y-3">
-          <p className="text-xs font-semibold text-primary flex items-center gap-1.5 uppercase tracking-wider">
-            <BookOpen className="h-3.5 w-3.5" /> Assessment Rules & Guidelines
-          </p>
-          <div className="grid sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-              <span><strong>Fullscreen Portal:</strong> Session launches in dedicated full-screen mode for focus.</span>
+        {/* Assessment Timer Toggle */}
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-border/50 bg-muted/20">
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="text-xs font-semibold text-foreground">15-Minute Session Timer</span>
+              <Badge variant="outline" className="text-[10px] font-normal border-border/50">Optional</Badge>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0" />
-              <span><strong>3 Warnings Rule:</strong> Tab switching or unfocusing is monitored — 3 warnings before auto-termination.</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-              <span><strong>Voice or Text:</strong> Answer by typing or record your voice with AI filler-word removal.</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-              <span>AI grades on Correctness (40%), Reasoning (25%), Clarity (20%), and Coverage (15%).</span>
-            </div>
+            <p className="text-[11px] text-muted-foreground">
+              {timerEnabled ? "Countdown timer will guide your pacing during the interview" : "No time limit — answer each question at your own pace"}
+            </p>
           </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={timerEnabled}
+            onClick={() => setTimerEnabled(!timerEnabled)}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              timerEnabled ? "bg-primary" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                timerEnabled ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
         </div>
+
+        {/* Minimalist Guidelines Accordion */}
+        <Accordion className="border-t border-border/40 pt-1">
+          <AccordionItem value="rules" className="border-0">
+            <AccordionTrigger className="py-2 text-xs text-muted-foreground hover:text-foreground hover:no-underline">
+              <span className="flex items-center gap-2 font-medium">
+                <BookOpen className="h-3.5 w-3.5 text-primary" /> Rules & Proctoring Guidelines (Fullscreen, 3 warnings)
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="pt-1 pb-2 text-xs text-muted-foreground">
+              <div className="grid sm:grid-cols-2 gap-2 rounded-xl bg-muted/30 p-3.5 border border-border/40 text-[11px]">
+                <p>• <strong>Fullscreen Portal:</strong> Launches in focused fullscreen examination mode.</p>
+                <p>• <strong>3 Warnings Rule:</strong> Tab switching or unfocusing is monitored — 3 warnings before auto-termination.</p>
+                <p>• <strong>Voice or Text:</strong> Answer via microphone (with AI filler-word removal) or by typing.</p>
+                <p>• <strong>Grading:</strong> Graded on Correctness (40%), Reasoning (25%), Clarity (20%), Coverage (15%).</p>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <Button
           onClick={onStart}
           disabled={starting}
-          className="h-12 w-full rounded-xl bg-primary text-white gap-2 font-semibold text-sm shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 transition-all"
+          className="h-11 w-full rounded-xl bg-primary text-white gap-2 font-semibold text-sm shadow-sm hover:shadow-md transition-all"
         >
           {starting ? (
             <><Loader2 className="h-4 w-4 animate-spin" />Generating questions...</>
@@ -316,32 +341,32 @@ function SetupStage({
 
       {/* Past Interviews */}
       {history.length > 0 && (
-        <div className="space-y-4 pt-2">
+        <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <Clock className="h-5 w-5 text-primary" /> Past Mock Interviews
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary" /> Past Mock Interviews
             </h2>
             <span className="text-xs text-muted-foreground">{history.length} session{history.length === 1 ? "" : "s"}</span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {history.map((record) => (
               <div
                 key={record._id}
-                className={`rounded-2xl border bg-card p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all hover:border-primary/30 ${difficultyBorder[record.difficulty]}`}
+                className={`rounded-xl border bg-card p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:border-primary/30 ${difficultyBorder[record.difficulty]}`}
               >
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-foreground text-base">{record.role}</span>
+                    <span className="font-semibold text-foreground text-sm">{record.role}</span>
                     <Badge className={difficultyColors[record.difficulty]}>{record.difficulty}</Badge>
-                    <Badge className="bg-blue-500/10 text-blue-500 border-0 capitalize">{record.interviewType}</Badge>
+                    <Badge className="bg-blue-500/10 text-blue-500 border-0 capitalize text-[10px]">{record.interviewType}</Badge>
                     {record.terminatedEarly && (
                       <Badge className="bg-red-500/10 text-red-500 border-red-500/30 text-[10px] gap-1">
                         <ShieldAlert className="h-3 w-3" /> Terminated
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className={`font-bold text-base ${scoreColor(record.overallScore)}`}>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className={`font-bold ${scoreColor(record.overallScore)}`}>
                       {record.overallScore}/100
                     </span>
                     <span>•</span>
@@ -352,7 +377,7 @@ function SetupStage({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="rounded-xl gap-1.5 text-xs h-9"
+                    className="rounded-lg gap-1.5 text-xs h-8"
                     onClick={() => onViewReport(record)}
                   >
                     <BarChart3 className="h-3.5 w-3.5" /> View Report
@@ -360,10 +385,11 @@ function SetupStage({
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-9 w-9 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl"
-                    onClick={() => onDeleteHistory(record._id)}
+                    className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg"
+                    title="Delete interview record"
+                    onClick={() => onRequestDelete(record._id)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
@@ -391,6 +417,9 @@ interface ActiveStageProps {
   warnings: number;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  timerEnabled: boolean;
+  timeRemaining: number;
+  onToggleTimer: () => void;
 }
 
 function ActiveStage({
@@ -407,6 +436,9 @@ function ActiveStage({
   warnings,
   isFullscreen,
   onToggleFullscreen,
+  timerEnabled,
+  timeRemaining,
+  onToggleTimer,
 }: ActiveStageProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
@@ -432,34 +464,65 @@ function ActiveStage({
 
   return (
     <div className="fixed inset-0 z-50 bg-background overflow-y-auto flex flex-col">
-      {/* Dedicated Top Proctoring Bar */}
-      <header className="sticky top-0 z-20 border-b border-border/80 bg-background/95 backdrop-blur px-4 sm:px-6 py-3 flex items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center gap-3">
+      {/* Top Proctoring & Status Bar */}
+      <header className="sticky top-0 z-20 border-b border-border/70 bg-background/95 backdrop-blur px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary shrink-0">
             <Video className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-foreground">Mock Interview</span>
+              <span className="font-bold text-xs sm:text-sm text-foreground truncate max-w-[150px] sm:max-w-none">{role}</span>
               <Badge className={difficultyColors[difficulty]}>{difficulty}</Badge>
-              <Badge className="bg-blue-500/10 text-blue-500 border-0 capitalize text-[10px]">{type}</Badge>
+              <Badge className="bg-blue-500/10 text-blue-500 border-0 capitalize text-[10px] hidden sm:inline-flex">{type}</Badge>
             </div>
-            <p className="text-[11px] text-muted-foreground truncate max-w-[180px] sm:max-w-none">{role}</p>
           </div>
         </div>
 
-        {/* Proctoring Indicators */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Proctoring Indicators & Timer */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Timer Toggle Button */}
+          <button
+            type="button"
+            onClick={onToggleTimer}
+            title={timerEnabled ? "Timer active (click to toggle)" : "Click to enable 15-minute timer"}
+            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-mono font-medium transition-colors ${
+              !timerEnabled
+                ? "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                : timeRemaining < 120
+                ? "border-red-500/40 bg-red-500/10 text-red-500 animate-pulse font-bold"
+                : timeRemaining < 300
+                ? "border-amber-500/40 bg-amber-500/10 text-amber-500 font-semibold"
+                : "border-primary/30 bg-primary/10 text-primary font-semibold"
+            }`}
+          >
+            <Clock className="h-3.5 w-3.5" />
+            {timerEnabled ? (
+              <span>
+                {Math.floor(timeRemaining / 60)
+                  .toString()
+                  .padStart(2, "0")}
+                :
+                {(timeRemaining % 60)
+                  .toString()
+                  .padStart(2, "0")}
+              </span>
+            ) : (
+              <span className="font-sans text-[11px]">Timer: Off</span>
+            )}
+          </button>
+
+          {/* Proctoring status badge */}
           <div className="flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-500">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="hidden sm:inline">Proctoring Active</span>
+            <span className="hidden md:inline">Proctored</span>
           </div>
 
           {/* Warning count badge */}
           <div
-            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${
+            className={`flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold ${
               warnings === 0
-                ? "border-border bg-muted/40 text-muted-foreground"
+                ? "border-border/60 bg-muted/30 text-muted-foreground"
                 : warnings === 1
                 ? "border-amber-500/30 bg-amber-500/10 text-amber-500"
                 : warnings === 2
@@ -468,7 +531,7 @@ function ActiveStage({
             }`}
           >
             <ShieldAlert className="h-3.5 w-3.5" />
-            <span>{warnings}/3 Warnings</span>
+            <span>{warnings}/3</span>
           </div>
 
           {/* Fullscreen Toggle */}
@@ -476,97 +539,86 @@ function ActiveStage({
             variant="ghost"
             size="sm"
             onClick={onToggleFullscreen}
-            className="h-8 px-2.5 rounded-lg text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+            className="h-8 px-2 rounded-lg text-xs gap-1 text-muted-foreground hover:text-foreground"
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
           >
             {isFullscreen ? (
-              <>
-                <Minimize2 className="h-3.5 w-3.5" />
-                <span className="hidden md:inline">Exit Fullscreen</span>
-              </>
+              <Minimize2 className="h-3.5 w-3.5" />
             ) : (
-              <>
-                <Maximize2 className="h-3.5 w-3.5 text-amber-500" />
-                <span className="hidden md:inline text-amber-500 font-medium">Fullscreen</span>
-              </>
+              <Maximize2 className="h-3.5 w-3.5 text-amber-500" />
             )}
           </Button>
         </div>
       </header>
 
-      {/* Main Examination View */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-6">
-        {/* Question Counter Card */}
-        <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Question {current + 1} <span className="text-muted-foreground font-normal text-base">of {total}</span>
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                Answer in your own words. Switching tabs or leaving the screen is monitored.
-              </p>
-            </div>
-            <div className="sm:text-right shrink-0 space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">
-                {answeredCount} of {total} answered
-              </p>
-              <div className="flex items-center gap-1.5 sm:justify-end">
+      {/* Main Examination View - Minimalist & Focused */}
+      <main className="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 md:p-8 space-y-4">
+        {/* Unified Assessment Card */}
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.15 }}
+          className="rounded-2xl border border-border/80 bg-card shadow-xs overflow-hidden"
+        >
+          {/* Subtle Progress Bar on Top Edge */}
+          <Progress value={progress} className="h-1 rounded-none bg-muted/40" />
+
+          {/* Card Header: Navigation & Question Counter */}
+          <div className="px-5 sm:px-7 py-3.5 flex items-center justify-between border-b border-border/50 bg-muted/10">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-semibold text-foreground">
+                Question {current + 1} of {total}
+              </span>
+              <div className="flex items-center gap-1.5">
                 {questions.map((_, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setCurrent(i)}
-                    title={`Jump to question ${i + 1}`}
-                    className={`h-2 rounded-full transition-all ${
+                    title={`Question ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all ${
                       i === current
-                        ? "w-7 bg-primary"
+                        ? "w-6 bg-primary"
                         : answers[i]?.trim()
-                        ? "w-2.5 bg-emerald-500 hover:opacity-80"
-                        : "w-2.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                        ? "w-2 bg-emerald-500"
+                        : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                     }`}
                   />
                 ))}
               </div>
             </div>
+            <span className="text-[11px] text-muted-foreground font-medium">
+              {answeredCount}/{total} answered
+            </span>
           </div>
-          <Progress value={progress} className="h-1.5" />
-        </div>
 
-        {/* Question Card */}
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-          className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden"
-        >
           {/* Question Prompt */}
-          <div className="p-6 sm:p-8 border-b border-border bg-muted/15">
-            <div className="flex items-start gap-4">
-              <span className="mt-0.5 text-xs font-bold text-primary shrink-0 bg-primary/10 border border-primary/20 rounded-full h-8 w-8 flex items-center justify-center">
-                {current + 1}
-              </span>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">Prompt</p>
-                <p className="text-base sm:text-lg font-semibold text-foreground leading-relaxed">
-                  {q?.question}
-                </p>
-              </div>
-            </div>
+          <div className="p-5 sm:p-7 space-y-2 border-b border-border/40">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Interview Question</span>
+            <h2 className="text-base sm:text-lg font-semibold text-foreground leading-relaxed">
+              {q?.question}
+            </h2>
           </div>
 
-          {/* Answer Textarea */}
-          <div className="p-6 sm:p-8 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Your Answer
-                </label>
-                <span className="text-[11px] text-muted-foreground">
-                  • {(answers[current] || "").length} characters
-                </span>
+          {/* Answer Area */}
+          <div className="p-5 sm:p-7 space-y-4">
+            {/* Prominent Voice Answer Action Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-primary/[0.04] border border-primary/20">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary shrink-0">
+                  <Mic className="h-4 w-4" />
+                </div>
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-semibold text-foreground">Record Answer with Voice</p>
+                    <Badge className="bg-primary/15 text-primary border-0 text-[10px] font-semibold">AI Clean</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Speak naturally — filler words (um, uh, like) are automatically cleaned.
+                  </p>
+                </div>
               </div>
               <VoiceRecorder
                 onTranscribe={(cleanText) => {
@@ -577,17 +629,29 @@ function ActiveStage({
                 disabled={submitting}
               />
             </div>
-            <textarea
-              ref={textareaRef}
-              value={answers[current] || ""}
-              onChange={(e) => updateAnswer(e.target.value)}
-              placeholder={
-                type === "technical"
-                  ? "Explain your approach, core concepts, tradeoffs, edge cases, and architectural considerations..."
-                  : "Structure using the STAR framework: Situation, Task, Action you took, and measurable Results..."
-              }
-              className="w-full resize-none rounded-xl border border-border bg-background p-4 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all min-h-[160px]"
-            />
+
+            {/* Response Textarea */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Your Written Answer
+                </label>
+                <span className="text-[11px] text-muted-foreground">
+                  {(answers[current] || "").length} characters
+                </span>
+              </div>
+              <textarea
+                ref={textareaRef}
+                value={answers[current] || ""}
+                onChange={(e) => updateAnswer(e.target.value)}
+                placeholder={
+                  type === "technical"
+                    ? "Type your technical explanation here, or click Record Answer above to speak..."
+                    : "Structure your response using STAR, or click Record Answer above to speak..."
+                }
+                className="w-full resize-none rounded-xl border border-border/70 bg-background p-4 text-sm leading-relaxed text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all min-h-[160px]"
+              />
+            </div>
           </div>
         </motion.div>
 
@@ -595,7 +659,7 @@ function ActiveStage({
         <div className="flex items-center justify-between gap-3 pt-1">
           <Button
             variant="outline"
-            className="rounded-xl gap-2 h-11 px-5"
+            className="rounded-xl gap-2 h-10 px-4 text-xs font-medium"
             disabled={current === 0}
             onClick={() => setCurrent(current - 1)}
           >
@@ -604,14 +668,14 @@ function ActiveStage({
 
           {current < total - 1 ? (
             <Button
-              className="rounded-xl gap-2 bg-primary text-white h-11 px-6 shadow-sm"
+              className="rounded-xl gap-2 bg-primary text-white h-10 px-5 text-xs font-medium shadow-2xs"
               onClick={() => setCurrent(current + 1)}
             >
-              Next <ChevronRight className="h-4 w-4" />
+              Next Question <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
             <Button
-              className="rounded-xl gap-2 bg-emerald-600 hover:bg-emerald-700 text-white h-11 px-6 shadow-sm"
+              className="rounded-xl gap-2 bg-emerald-600 hover:bg-emerald-700 text-white h-10 px-5 text-xs font-medium shadow-2xs"
               onClick={() => setShowFinishDialog(true)}
               disabled={submitting}
             >
@@ -1009,6 +1073,35 @@ export default function MockInterviewPage() {
   const [report, setReport] = useState<MockReport | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  // Timer state
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 mins default
+
+  // Session countdown timer
+  useEffect(() => {
+    if (stage !== "active" || !timerEnabled) return;
+    const interval = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          toast.warning("Assessment timer expired! Wrap up your responses and submit when ready.", {
+            duration: 6000,
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [stage, timerEnabled]);
+
+  const handleToggleTimer = () => {
+    if (!timerEnabled && timeRemaining <= 0) {
+      setTimeRemaining(15 * 60);
+    }
+    setTimerEnabled((prev) => !prev);
+  };
+
   // Fresh state refs for event listeners and async triggers
   const answersRef = useRef(answers);
   answersRef.current = answers;
@@ -1246,7 +1339,9 @@ export default function MockInterviewPage() {
               starting={starting}
               history={history}
               onViewReport={handleViewReport}
-              onDeleteHistory={handleDeleteHistory}
+              onRequestDelete={(id) => setDeleteId(id)}
+              timerEnabled={timerEnabled}
+              setTimerEnabled={setTimerEnabled}
             />
           </motion.div>
         )}
@@ -1267,6 +1362,9 @@ export default function MockInterviewPage() {
               warnings={warnings}
               isFullscreen={isFullscreen}
               onToggleFullscreen={toggleFullscreen}
+              timerEnabled={timerEnabled}
+              timeRemaining={timeRemaining}
+              onToggleTimer={handleToggleTimer}
             />
           </motion.div>
         )}
@@ -1393,9 +1491,9 @@ export default function MockInterviewPage() {
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete this record?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this interview record?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              This action cannot be undone. This will permanently remove this mock interview and its AI evaluation report from your history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1405,7 +1503,7 @@ export default function MockInterviewPage() {
                 if (deleteId) handleDeleteHistory(deleteId);
                 setDeleteId(null);
               }}
-              className="rounded-xl bg-red-500 hover:bg-red-600 text-white"
+              className="rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium"
             >
               Delete
             </AlertDialogAction>
