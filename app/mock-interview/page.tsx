@@ -165,6 +165,8 @@ interface SetupStageProps {
   onRequestDelete: (id: string) => void;
   timerEnabled: boolean;
   setTimerEnabled: (v: boolean) => void;
+  timerDuration: number;
+  setTimerDuration: (v: number) => void;
 }
 
 function SetupStage({
@@ -181,6 +183,8 @@ function SetupStage({
   onRequestDelete,
   timerEnabled,
   setTimerEnabled,
+  timerDuration,
+  setTimerDuration,
 }: SetupStageProps) {
   return (
     <div className="space-y-6">
@@ -226,7 +230,7 @@ function SetupStage({
                 onClick={() => setRole(r)}
                 className={`rounded-lg px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                   role === r
-                    ? "bg-primary text-white shadow-2xs"
+                    ? "bg-primary text-white shadow-2xs font-semibold"
                     : "bg-muted/40 text-muted-foreground hover:bg-muted/70 hover:text-foreground"
                 }`}
               >
@@ -236,11 +240,11 @@ function SetupStage({
           </div>
         </div>
 
-        {/* Type & Difficulty Segmented Selectors */}
+        {/* Type & Difficulty Segmented Selectors - Clear Distinction */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Interview Type</label>
-            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full">
+            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full gap-1">
               {(["technical", "hr"] as const).map((t) => (
                 <button
                   key={t}
@@ -248,8 +252,8 @@ function SetupStage({
                   onClick={() => setType(t)}
                   className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
                     type === t
-                      ? "bg-background text-foreground shadow-xs border border-border/40"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-white shadow-sm font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium"
                   }`}
                 >
                   {t === "technical" ? "Technical Focus" : "HR & Behavioral"}
@@ -259,7 +263,7 @@ function SetupStage({
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Difficulty Level</label>
-            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full">
+            <div className="inline-flex p-1 rounded-xl bg-muted/40 border border-border/50 w-full gap-1">
               {(["easy", "medium", "hard"] as const).map((d) => (
                 <button
                   key={d}
@@ -267,8 +271,8 @@ function SetupStage({
                   onClick={() => setDifficulty(d)}
                   className={`flex-1 py-2 text-xs font-semibold capitalize rounded-lg transition-all ${
                     difficulty === d
-                      ? "bg-background text-foreground shadow-xs border border-border/40"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-white shadow-sm font-bold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50 font-medium"
                   }`}
                 >
                   {d}
@@ -278,33 +282,62 @@ function SetupStage({
           </div>
         </div>
 
-        {/* Assessment Timer Toggle */}
-        <div className="flex items-center justify-between p-3.5 rounded-xl border border-border/50 bg-muted/20">
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-primary" />
-              <span className="text-xs font-semibold text-foreground">15-Minute Session Timer</span>
-              <Badge variant="outline" className="text-[10px] font-normal border-border/50">Optional</Badge>
+        {/* Assessment Timer Toggle & Duration */}
+        <div className="p-3.5 rounded-xl border border-border/50 bg-muted/20 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                <span className="text-xs font-semibold text-foreground">
+                  {timerEnabled ? `${timerDuration}-Minute Session Timer` : "Session Timer"}
+                </span>
+                <Badge variant="outline" className="text-[10px] font-normal border-border/50">Optional</Badge>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                {timerEnabled
+                  ? `${timerDuration}-minute countdown timer will guide your pacing during the interview`
+                  : "No time limit — answer each question at your own pace"}
+              </p>
             </div>
-            <p className="text-[11px] text-muted-foreground">
-              {timerEnabled ? "Countdown timer will guide your pacing during the interview" : "No time limit — answer each question at your own pace"}
-            </p>
-          </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={timerEnabled}
-            onClick={() => setTimerEnabled(!timerEnabled)}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-              timerEnabled ? "bg-primary" : "bg-muted-foreground/30"
-            }`}
-          >
-            <span
-              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
-                timerEnabled ? "translate-x-5" : "translate-x-0"
+            <button
+              type="button"
+              role="switch"
+              aria-checked={timerEnabled}
+              onClick={() => setTimerEnabled(!timerEnabled)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                timerEnabled ? "bg-primary" : "bg-muted-foreground/30"
               }`}
-            />
-          </button>
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
+                  timerEnabled ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Duration selector when timer is enabled */}
+          {timerEnabled && (
+            <div className="pt-2.5 border-t border-border/40 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[11px] font-medium text-muted-foreground">Choose Timer Duration:</span>
+              <div className="inline-flex p-0.5 rounded-lg bg-background/80 border border-border/50 gap-0.5">
+                {[10, 15, 20, 30].map((mins) => (
+                  <button
+                    key={mins}
+                    type="button"
+                    onClick={() => setTimerDuration(mins)}
+                    className={`px-3 py-1 text-xs rounded-md transition-all ${
+                      timerDuration === mins
+                        ? "bg-primary text-white shadow-xs font-semibold"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/40 font-medium"
+                    }`}
+                  >
+                    {mins} min
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Minimalist Guidelines Accordion */}
@@ -1075,7 +1108,13 @@ export default function MockInterviewPage() {
 
   // Timer state
   const [timerEnabled, setTimerEnabled] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(15 * 60); // 15 mins default
+  const [timerDuration, setTimerDuration] = useState(15); // in minutes
+  const [timeRemaining, setTimeRemaining] = useState(15 * 60);
+
+  const handleSetTimerDuration = (mins: number) => {
+    setTimerDuration(mins);
+    setTimeRemaining(mins * 60);
+  };
 
   // Session countdown timer
   useEffect(() => {
@@ -1097,7 +1136,7 @@ export default function MockInterviewPage() {
 
   const handleToggleTimer = () => {
     if (!timerEnabled && timeRemaining <= 0) {
-      setTimeRemaining(15 * 60);
+      setTimeRemaining(timerDuration * 60);
     }
     setTimerEnabled((prev) => !prev);
   };
@@ -1186,6 +1225,7 @@ export default function MockInterviewPage() {
       setAnswers(new Array(json.data.questions.length).fill(""));
       setCurrent(0);
       setWarnings(0);
+      setTimeRemaining(timerDuration * 60);
       terminatingRef.current = false;
       setStage("active");
     } catch (err: any) {
@@ -1300,6 +1340,7 @@ export default function MockInterviewPage() {
     setAnswers([]);
     setCurrent(0);
     setWarnings(0);
+    setTimeRemaining(timerDuration * 60);
     setReport(null);
     setStage("setup");
   };
@@ -1342,6 +1383,8 @@ export default function MockInterviewPage() {
               onRequestDelete={(id) => setDeleteId(id)}
               timerEnabled={timerEnabled}
               setTimerEnabled={setTimerEnabled}
+              timerDuration={timerDuration}
+              setTimerDuration={handleSetTimerDuration}
             />
           </motion.div>
         )}
