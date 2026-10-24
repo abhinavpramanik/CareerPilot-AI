@@ -48,6 +48,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { VoiceRecorder } from "@/components/mock-interview/VoiceRecorder";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -291,7 +292,7 @@ function SetupStage({
             </div>
             <div className="flex items-start gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
-              <span>5 questions presented one-by-one — answer in your own words.</span>
+              <span><strong>Voice or Text:</strong> Answer by typing or record your voice with AI filler-word removal.</span>
             </div>
             <div className="flex items-start gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
@@ -558,13 +559,23 @@ function ActiveStage({
 
           {/* Answer Textarea */}
           <div className="p-6 sm:p-8 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Your Answer
-              </label>
-              <span className="text-[11px] text-muted-foreground">
-                {(answers[current] || "").length} characters
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Your Answer
+                </label>
+                <span className="text-[11px] text-muted-foreground">
+                  • {(answers[current] || "").length} characters
+                </span>
+              </div>
+              <VoiceRecorder
+                onTranscribe={(cleanText) => {
+                  const existing = answers[current]?.trim() || "";
+                  const merged = existing ? `${existing} ${cleanText}` : cleanText;
+                  updateAnswer(merged);
+                }}
+                disabled={submitting}
+              />
             </div>
             <textarea
               ref={textareaRef}
