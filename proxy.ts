@@ -14,6 +14,7 @@ export default auth((req) => {
     "/projects",
     "/ats-review",
     "/interview",
+    "/mock-interview",
     "/profile",
   ];
 

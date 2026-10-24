@@ -13,7 +13,8 @@ import {
   ArrowRight,
   TrendingUp,
   AlertCircle,
-  Clock
+  Clock,
+  Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -98,7 +99,8 @@ export function DashboardClient({ user, report, hasResume }: DashboardClientProp
     { href: "/skill-gap", icon: Target, label: "Skill Gaps", desc: "Find missing skills" },
     { href: "/roadmap", icon: Map, label: "Roadmap", desc: "Your weekly plan" },
     { href: "/ats-review", icon: CheckSquare, label: "ATS Review", desc: "Formatting issues" },
-    { href: "/interview", icon: Sparkles, label: "Interview Prep", desc: "Practice questions" },
+    { href: "/interview", icon: Sparkles, label: "Interview Practice", desc: "Study questions" },
+    { href: "/mock-interview", icon: Video, label: "Mock Interview", desc: "Simulate & get scored" },
   ];
 
   return (

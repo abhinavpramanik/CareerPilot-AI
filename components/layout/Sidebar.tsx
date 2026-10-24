@@ -13,6 +13,7 @@ import {
   FolderGit2,
   CheckSquare,
   Mic,
+  Video,
   UserRound,
   Settings,
   LogOut,
@@ -36,7 +37,8 @@ const navItems = [
   { href: "/roadmap", icon: Map, label: "Roadmap" },
   { href: "/projects", icon: FolderGit2, label: "Projects" },
   { href: "/ats-review", icon: CheckSquare, label: "ATS Match" },
-  { href: "/interview", icon: Mic, label: "Interviews" },
+  { href: "/interview", icon: Mic, label: "Interview Practice" },
+  { href: "/mock-interview", icon: Video, label: "Mock Interview" },
 ];
 
 const bottomItems = [
