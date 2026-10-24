@@ -283,15 +283,21 @@ function SetupStage({
         </div>
 
         {/* Assessment Timer Toggle & Duration */}
-        <div className="p-3.5 rounded-xl border border-border/50 bg-muted/20 space-y-3">
+        <div className={`p-3.5 rounded-xl border space-y-3 transition-colors ${
+          timerEnabled
+            ? "border-red-500/30 bg-red-500/[0.04]"
+            : "border-border/50 bg-muted/20"
+        }`}>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span className="text-xs font-semibold text-foreground">
+                <Clock className={`h-4 w-4 ${timerEnabled ? "text-red-500 animate-pulse" : "text-muted-foreground"}`} />
+                <span className={`text-xs font-semibold ${timerEnabled ? "text-red-500" : "text-foreground"}`}>
                   {timerEnabled ? `${timerDuration}-Minute Session Timer` : "Session Timer"}
                 </span>
-                <Badge variant="outline" className="text-[10px] font-normal border-border/50">Optional</Badge>
+                <Badge variant="outline" className={`text-[10px] font-normal ${timerEnabled ? "border-red-500/30 text-red-500 bg-red-500/10" : "border-border/50"}`}>
+                  {timerEnabled ? "Active" : "Optional"}
+                </Badge>
               </div>
               <p className="text-[11px] text-muted-foreground">
                 {timerEnabled
@@ -305,7 +311,7 @@ function SetupStage({
               aria-checked={timerEnabled}
               onClick={() => setTimerEnabled(!timerEnabled)}
               className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                timerEnabled ? "bg-primary" : "bg-muted-foreground/30"
+                timerEnabled ? "bg-red-500" : "bg-muted-foreground/30"
               }`}
             >
               <span
@@ -318,7 +324,7 @@ function SetupStage({
 
           {/* Duration selector when timer is enabled */}
           {timerEnabled && (
-            <div className="pt-2.5 border-t border-border/40 flex flex-wrap items-center justify-between gap-2">
+            <div className="pt-2.5 border-t border-red-500/20 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[11px] font-medium text-muted-foreground">Choose Timer Duration:</span>
               <div className="inline-flex p-0.5 rounded-lg bg-background/80 border border-border/50 gap-0.5">
                 {[10, 15, 20, 30].map((mins) => (
@@ -328,7 +334,7 @@ function SetupStage({
                     onClick={() => setTimerDuration(mins)}
                     className={`px-3 py-1 text-xs rounded-md transition-all ${
                       timerDuration === mins
-                        ? "bg-primary text-white shadow-xs font-semibold"
+                        ? "bg-red-500 text-white shadow-xs font-bold"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/40 font-medium"
                     }`}
                   >
@@ -514,34 +520,36 @@ function ActiveStage({
 
         {/* Proctoring Indicators & Timer */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-          {/* Timer Toggle Button */}
+          {/* Timer Toggle Button - Prominent Red */}
           <button
             type="button"
             onClick={onToggleTimer}
-            title={timerEnabled ? "Timer active (click to toggle)" : "Click to enable 15-minute timer"}
-            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-mono font-medium transition-colors ${
+            title={timerEnabled ? "Timer active (click to toggle)" : "Click to enable timer"}
+            className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs sm:text-sm font-mono font-bold transition-all shadow-xs ${
               !timerEnabled
                 ? "border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                : timeRemaining < 120
-                ? "border-red-500/40 bg-red-500/10 text-red-500 animate-pulse font-bold"
-                : timeRemaining < 300
-                ? "border-amber-500/40 bg-amber-500/10 text-amber-500 font-semibold"
-                : "border-primary/30 bg-primary/10 text-primary font-semibold"
+                : "border-red-500/60 bg-red-500/15 text-red-500 dark:text-red-400 shadow-sm shadow-red-500/20"
             }`}
           >
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className={`h-4 w-4 ${timerEnabled ? "text-red-500 animate-pulse" : "text-muted-foreground"}`} />
             {timerEnabled ? (
-              <span>
-                {Math.floor(timeRemaining / 60)
-                  .toString()
-                  .padStart(2, "0")}
-                :
-                {(timeRemaining % 60)
-                  .toString()
-                  .padStart(2, "0")}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-extrabold tracking-widest text-red-500 dark:text-red-400">
+                  {Math.floor(timeRemaining / 60)
+                    .toString()
+                    .padStart(2, "0")}
+                  :
+                  {(timeRemaining % 60)
+                    .toString()
+                    .padStart(2, "0")}
+                </span>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+              </div>
             ) : (
-              <span className="font-sans text-[11px]">Timer: Off</span>
+              <span className="font-sans text-xs font-semibold">Timer: Off</span>
             )}
           </button>
 
@@ -599,7 +607,7 @@ function ActiveStage({
           <Progress value={progress} className="h-1 rounded-none bg-muted/40" />
 
           {/* Card Header: Navigation & Question Counter */}
-          <div className="px-5 sm:px-7 py-3.5 flex items-center justify-between border-b border-border/50 bg-muted/10">
+          <div className="px-5 sm:px-7 py-3.5 flex items-center justify-between border-b border-border/50 bg-muted/10 gap-2 flex-wrap">
             <div className="flex items-center gap-3">
               <span className="text-xs font-semibold text-foreground">
                 Question {current + 1} of {total}
@@ -622,6 +630,7 @@ function ActiveStage({
                 ))}
               </div>
             </div>
+
             <span className="text-[11px] text-muted-foreground font-medium">
               {answeredCount}/{total} answered
             </span>
