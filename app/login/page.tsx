@@ -24,11 +24,12 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const performLogin = async (loginEmail = email, loginPassword = password) => {
+  const handleCredentialsLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const res = await authenticateUser(loginEmail, loginPassword);
+      const res = await authenticateUser(email, password);
 
       if (res?.error) {
         setError(res.error);
@@ -41,17 +42,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCredentialsLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await performLogin();
-  };
-
-  const handleDemoLogin = async () => {
-    setEmail("abhinav@gmail.com");
-    setPassword("12345");
-    await performLogin("abhinav@gmail.com", "12345");
   };
 
   return (
@@ -151,16 +141,6 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={loading}
-              onClick={handleDemoLogin}
-              className="w-full rounded-2xl py-6 text-sm font-semibold border-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/15 transition-all shadow-sm"
-            >
-              <Zap className="mr-2 h-4 w-4 text-primary" />
-              Use Demo Credentials & Login
-            </Button>
             <Button
               type="submit"
               disabled={loading}

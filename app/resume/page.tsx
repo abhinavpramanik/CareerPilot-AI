@@ -14,7 +14,6 @@ import {
   Code,
   Briefcase,
   Trophy,
-  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -105,19 +104,11 @@ export default function ResumePage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Resume</h1>
-          <p className="mt-1 text-muted-foreground">
-            Upload your resume and let AI extract your profile.
-          </p>
-        </div>
-        <a href="https://drive.google.com/uc?export=download&id=1Hk8brgDgoNQqyedkqiaj0L8KxdTa93QJ" download>
-          <Button type="button" variant="outline" className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary/5 flex items-center">
-            <Download className="h-4 w-4" />
-            Download Sample Resume
-          </Button>
-        </a>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Resume</h1>
+        <p className="mt-1 text-muted-foreground">
+          Upload your resume and let AI extract your profile.
+        </p>
       </div>
 
       {/* Upload area */}
