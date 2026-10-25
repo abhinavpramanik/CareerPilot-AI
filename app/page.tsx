@@ -1,4 +1,4 @@
-"use client";
+99"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -248,15 +248,15 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-6 pt-12 pb-20 md:pt-20 md:pb-28 lg:pt-28 lg:pb-36">
+      <section className="relative overflow-hidden px-6 pt-6 pb-14 md:pt-10 md:pb-18 lg:pt-12 lg:pb-20">
         <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
             {/* Left Column: Editorial Copy */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
-              className="max-w-2xl"
+              className="lg:col-span-6 xl:col-span-6"
             >
               {/* Announcement Badge */}
               <a
@@ -324,52 +324,25 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-              className="relative lg:ml-auto w-full max-w-2xl"
+              className="lg:col-span-6 xl:col-span-6 relative w-full flex items-center justify-center lg:justify-end"
             >
               {/* Decorative background glow */}
               <div className="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-3xl opacity-50 dark:opacity-30 pointer-events-none"></div>
 
               <motion.div
-                animate={{ y: [0, -12, 0] }}
+                animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
                 className="relative z-10 w-full"
               >
                 <Image
                   src="/Hero_section_Img.png"
-                  alt="CareerPilot AI Dashboard Preview"
-                  width={1000}
-                  height={1000}
-                  className="w-full h-auto drop-shadow-2xl pointer-events-none select-none object-contain rounded-2xl"
+                  alt="CareerPilot AI Platform Ecosystem"
+                  width={1400}
+                  height={933}
+                  className="w-full h-auto drop-shadow-2xl pointer-events-none select-none object-contain"
                   draggable={false}
                   priority
                 />
-
-                {/* Floating Mock Interview Live Pill */}
-                <div className="absolute -bottom-4 -left-4 sm:bottom-6 sm:left-4 z-20 rounded-xl border border-border/80 bg-card/95 p-3.5 shadow-xl backdrop-blur-md flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
-                    <Mic className="h-5 w-5 animate-pulse" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-foreground">Live Voice Exam</span>
-                      <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                        Proctored
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Waveform active • Filler words filtered</p>
-                  </div>
-                </div>
-
-                {/* Floating Score Badge */}
-                <div className="hidden sm:flex absolute -top-3 -right-3 z-20 rounded-xl border border-border/80 bg-card/95 p-3 shadow-xl backdrop-blur-md items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Trophy className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-foreground">Readiness: 92/100</span>
-                    <p className="text-[10px] text-muted-foreground">Placement Ready</p>
-                  </div>
-                </div>
               </motion.div>
             </motion.div>
           </div>
