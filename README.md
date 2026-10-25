@@ -4,10 +4,12 @@
 **Your Intelligent Career Mentor & Placement Readiness Platform**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 [![Google Gemini](https://img.shields.io/badge/Gemini-AI-4285F4?style=for-the-badge&logo=google)](https://ai.google.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![NextAuth](https://img.shields.io/badge/NextAuth-v5-magenta?style=for-the-badge)](https://next-auth.js.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 
 **Live Demo:** [https://career-pilot-ai-1wmq.vercel.app/](https://career-pilot-ai-1wmq.vercel.app/)
 
@@ -17,42 +19,73 @@
 
 ## 🌟 Overview
 
-**CareerPilot AI** is a comprehensive, AI-powered career intelligence platform built specifically for college students and fresh graduates. Navigating the journey from academia to industry can be overwhelming. CareerPilot bridges this gap by evaluating user profiles, predicting placement readiness, and providing hyper-personalized, actionable roadmaps.
+**CareerPilot AI** is a comprehensive, production-grade career intelligence and interview preparation ecosystem engineered specifically for college students and ambitious professionals. Navigating the journey from academia to high-impact technical roles requires objective feedback, targeted skill roadmaps, and authentic interview practice.
 
-Unlike generic advice platforms, CareerPilot AI uses advanced generative AI (Google Gemini) to deeply analyze unstructured data (like PDF resumes) and turn it into structured, quantifiable insights.
+CareerPilot AI bridges this gap through a multi-tiered AI architecture powered by **Google Gemini** and a **curated RAG (Retrieval-Augmented Generation) knowledge engine**. From instant ATS resume parsing to live, voice-enabled mock interviews with fullscreen anti-cheat proctoring, CareerPilot turns unstructured career data into quantifiable readiness and verifiable growth.
 
 ---
 
-## ✨ Core Features
+## ✨ Core Features & Latest Capabilities
 
-*   📄 **AI Resume Parsing & Analysis:** Upload a PDF resume and let our engine instantly extract and categorize your education, skills, projects, and experiences without manual data entry.
-*   📊 **Career Score Dashboard:** Get a holistic "Placement Readiness Score" based on a rigorous evaluation of your skills, project quality, and industry alignment.
-*   🎯 **Skill Gap Identification:** The AI compares your current skillset against industry standards for your target role and highlights exactly what you are missing.
-*   🗺️ **Personalized Learning Roadmaps:** Generates week-by-week, actionable learning paths with specific milestones and resource recommendations to bridge your skill gaps.
-*   🤖 **ATS Review:** Evaluates your resume through the lens of an Applicant Tracking System, giving you a compatibility score and actionable keyword suggestions.
-*   🎤 **Interview Preparation:** Simulates role-specific interview scenarios, generating technical and behavioral questions tailored specifically to your resume and target role.
+*   🎙️ **Interactive AI Mock Interview Simulation (Latest Upgrade):**
+    *   **Real-time Voice-to-Text Recording:** Speak responses naturally using browser Web Audio / MediaRecorder with live waveform visualization and AI-driven filler-word removal (*"um"*, *"uh"*, *"like"*, *"you know"*).
+    *   **Anti-Cheat Fullscreen Proctoring:** Rigorous examination mode featuring fullscreen enforcement, tab-switch monitoring, strike tracking, and integrity violation safeguards.
+    *   **4-Dimensional Rubric Evaluation:** Answers are graded with granular breakdowns across **Correctness (40%)**, **Logical Reasoning (25%)**, **Clarity & Communication (20%)**, and **Concept Coverage (15%)**.
+    *   **Comprehensive Scorecards:** Instant access to strengths, critical improvement areas, and model benchmark answers.
+    *   **Flexible Timer Controls & Session Management:** Per-question countdowns, session timers, and persistent report history with single-click deletion confirmation.
+
+*   📚 **RAG Knowledge Base & Grounded Citations (Phase 2):**
+    *   Grounded in verified role competency frameworks, skill prerequisite chains, and verified learning resources.
+    *   Validates AI recommendations against authoritative industry models with verifiable citations, eliminating hallucinations.
+
+*   📄 **AI Resume Parsing & Extraction:**
+    *   Upload PDF resumes and extract education, skills, work experience, and projects in milliseconds using Mozilla's binary buffer parser (`pdfjs-dist`).
+
+*   📊 **Comprehensive Placement Readiness Score:**
+    *   Holistic 0–100 scoring algorithm evaluating technical skills, project depth, experience quality, and role alignment.
+
+*   🤖 **ATS Optimization & Bullet-Point Enhancement:**
+    *   Applicant Tracking System parsing simulation providing overall keyword match scores, structural audit, and quantified bullet-point rewriting suggestions.
+
+*   🎯 **Skill-Gap Analysis & Industry Benchmarking:**
+    *   Identifies missing skills for your target role, categorized by priority (**High**, **Medium**, **Low**) with direct prerequisite mapping.
+
+*   🗺️ **Personalized Dynamic Learning Roadmaps:**
+    *   Generates week-by-week, phased action plans complete with milestone goals, curated resources, and checkpoint evaluations.
+
+*   🛠️ **Curated Portfolio Project Blueprints:**
+    *   Tailored, production-ready project suggestions with technical architectures, prerequisite stacks, and difficulty ratings to construct compelling proof-of-work portfolios.
+
+*   🎤 **Targeted Interview Practice (Read-Only Q&A):**
+    *   A curated repository of technical and behavioral interview questions generated directly from your resume and target role with structured STAR-method guidance.
 
 ---
 
 ## 🏗️ Architecture & Technology Stack
 
-CareerPilot AI is built on a modern, serverless-first stack designed for extreme speed, scalability, and developer experience.
+CareerPilot AI is architected on a modern, serverless-first stack built for sub-second responsiveness, strict validation, and developer agility.
 
 ### **Frontend Layer**
-*   **Next.js 16 (App Router):** Leverages React Server Components (RSC) for maximum performance and minimal client-side JavaScript.
-*   **Tailwind CSS:** For rapid, utility-first styling.
-*   **Shadcn/ui:** Accessible, customizable, and beautifully designed unstyled components.
-*   **Framer Motion:** For fluid, micro-interaction animations that create a premium, dynamic feel.
-*   **Lucide Icons:** Clean, consistent iconography.
+*   **Next.js 16 (App Router):** Server Components (RSC) and dynamic client routing for high performance.
+*   **React 19:** Modern concurrent features and reactive state primitives.
+*   **Tailwind CSS v4 & tw-animate-css:** Modern styling with dark mode tokens and HSL palettes.
+*   **Shadcn/ui & Radix Primitives:** Fully accessible, unstyled interactive components (Dialogs, Tabs, Accordions, Sheets, Badges).
+*   **Framer Motion:** Fluid animations, layout transitions, and interactive visualizers.
+*   **Lucide Icons:** Clean, modern iconography across all dashboards.
+*   **Sonner:** Toast notification system.
 
 ### **Backend Layer (Next.js API Routes)**
-*   **Serverless Handlers:** `force-dynamic` API routes to handle authentication, file processing, and AI generation.
-*   **PDF-JS Dist:** Custom Node.js implementation of Mozilla's PDF reader to accurately extract text from raw binary PDF buffers without relying on browser DOM APIs.
+*   **Serverless Route Handlers:** Dynamic API endpoints with session authentication and payload validation.
+*   **PDF-JS Dist:** Binary stream extraction for accurate, client-independent PDF text parsing.
+*   **Voice Audio Processing:** Native Web Audio API and Web Speech synthesis with Gemini transcription and filler-word suppression.
+*   **Anti-Cheat Event Listener:** Tab-visibility state detection, fullscreen change listeners, and strike recording.
 
-### **Data & AI Layer**
-*   **Google Gemini API (`gemini-flash-lite-latest`):** The core intelligence engine. We use highly engineered structured prompts to enforce that the AI **only returns validated JSON schemas**, allowing the frontend to confidently render complex dashboards.
-*   **MongoDB (Mongoose):** Flexible document database to store complex, nested AI analysis results (roadmaps, scores, project details) per user.
-*   **NextAuth.js (Auth.js v5):** Robust, secure authentication supporting both Google OAuth and standard Email/Password credentials with Bcrypt hashing.
+### **Data, AI & RAG Layer**
+*   **Google Gemini API (`gemini-flash-lite-latest`):** High-speed generative AI with structured JSON schema enforcement via Zod.
+*   **RAG Knowledge Retrieval (`lib/knowledge/`):** Context-aware retrieval engine filtering competency frameworks, skill dependencies, and learning citations.
+*   **Strict Scoring Rubric (`lib/scoring.ts`):** Deterministic weights (`INTERVIEW_WEIGHTS`), adaptive difficulty calculations, and grade brackets.
+*   **MongoDB Atlas (Mongoose 9):** Schema-validated persistence with models for `User`, `Resume`, `CareerScore`, `SkillGap`, `Roadmap`, `ATSReview`, `InterviewPrep`, `MockInterview`, `ProjectRecommendation`, and `KnowledgeItem`.
+*   **NextAuth.js (Auth.js v5):** Secure authentication supporting Google OAuth and Email/Password credentials with Bcrypt hashing.
 
 ---
 
@@ -60,24 +93,85 @@ CareerPilot AI is built on a modern, serverless-first stack designed for extreme
 
 ```mermaid
 graph TD
-    Client[Client Browser] -->|Uploads PDF / Triggers Analysis| NextAPI[Next.js API Routes]
+    Client[Client Browser: Voice / PDF / Proctoring] -->|Uploads PDF / Submits Voice Audio / Triggers Action| NextAPI[Next.js API Routes]
     
     subgraph Server-Side Processing
         NextAPI -->|1. Authenticate| Auth[NextAuth.js / JWT Session]
         NextAPI -->|2. Parse Binary Buffer| PDFExtractor[pdfjs-dist Text Extractor]
-        PDFExtractor -->|3. Raw Text| AIPrompt[Prompt Engineering Builder]
+        NextAPI -->|3. Process Audio & Anti-Cheat| AudioHandler[Voice Transcription & Proctoring Integrity]
+        PDFExtractor -->|4. Profile & Skills Context| RAGEngine[RAG Knowledge Base & Citation Engine]
+        AudioHandler -->|4. Answer Text| RAGEngine
+        RAGEngine -->|5. Grounded Context| AIPrompt[Prompt Engineering & Zod Schema Builder]
     end
     
     subgraph External Services
-        AIPrompt -->|4. Send Prompt| Gemini[Google Gemini AI]
-        Gemini -->|5. Return Structured JSON| NextAPI
+        AIPrompt -->|6. Send Structured Prompt| Gemini[Google Gemini AI]
+        Gemini -->|7. Return Validated JSON & Scores| NextAPI
     end
     
     subgraph Data Persistence
-        NextAPI -->|6. Save Analysis| MongoDB[(MongoDB Atlas)]
+        NextAPI -->|8. Save Sessions & Analysis| MongoDB[(MongoDB Atlas)]
     end
     
-    NextAPI -->|7. Return Dashboard Data| Client
+    NextAPI -->|9. Return Real-Time Dashboard & Reports| Client
+```
+
+---
+
+## 📂 Project Directory Structure
+
+```text
+├── app/
+│   ├── (app)/layout.tsx           # Authenticated application shell & sidebar
+│   ├── api/                       # Next.js Serverless API routes
+│   │   ├── analyze-resume/        # Resume text extraction & parsing
+│   │   ├── ats-review/            # ATS compatibility & keyword evaluation
+│   │   ├── career-score/          # Readiness scoring endpoint
+│   │   ├── interview-preparation/ # Practice questions generation
+│   │   ├── mock-interview/        # Start, submit, and transcribe voice sessions
+│   │   ├── project-recommendation/# Portfolio project recommendations
+│   │   ├── roadmap/               # Multi-week career roadmap builder
+│   │   └── skill-gap/             # Market-aligned skill gap analysis
+│   ├── ats-review/                # ATS scan dashboard & bullet rewriter
+│   ├── career-analysis/           # Career score breakdown & insights
+│   ├── dashboard/                 # Central user overview & metrics
+│   ├── interview/                 # Read-only interview practice questions
+│   ├── mock-interview/            # Interactive voice & proctored mock interview
+│   ├── projects/                  # Curated portfolio projects
+│   ├── resume/                    # Resume upload and structured viewer
+│   ├── roadmap/                   # Phased dynamic learning roadmap
+│   ├── skill-gap/                 # Skill gap breakdown & learning priorities
+│   ├── page.tsx                   # High-conversion landing page
+│   └── globals.css                # Tailwind CSS v4 design tokens & themes
+├── components/
+│   ├── layout/                    # Sidebar, MobileNav, headers
+│   ├── mock-interview/            # VoiceRecorder & audio visualizer
+│   └── ui/                        # Reusable Shadcn UI primitives
+├── lib/
+│   ├── knowledge/                 # RAG knowledge base, retrieval & citations
+│   ├── prompts/                   # Highly engineered Gemini prompt templates
+│   ├── auth.ts                    # NextAuth.js v5 configuration
+│   ├── db.ts                      # MongoDB connection caching
+│   ├── scoring.ts                 # 4-pillar interview scoring algorithms
+│   └── validation.ts              # Zod validation schemas for AI outputs
+├── models/                        # Mongoose data schemas
+└── test/                          # Node.js automated test suites
+```
+
+---
+
+## 🧪 Testing & Validation
+
+CareerPilot AI includes comprehensive automated test suites covering scoring algorithms, RAG retrieval, output schema validation, and session lifecycles:
+
+*   **`test/phase02.test.ts`**: Verifies knowledge base integrity, RAG metadata filtering, citation correctness, rubric scoring weights, and adaptive difficulty.
+*   **`test/scoring.test.ts`**: Asserts deterministic scoring calculations across correctness, reasoning, clarity, and coverage dimensions.
+*   **`test/validation.test.ts`**: Ensures Gemini AI responses strictly adhere to defined Zod schemas.
+*   **`test/lifecycle.test.ts`**: Validates end-to-end interview session state transitions and integrity logging.
+
+Run tests locally:
+```bash
+npx tsx --test test/*.test.ts
 ```
 
 ---
@@ -85,15 +179,15 @@ graph TD
 ## 🚀 Getting Started (Local Development)
 
 ### 1. Prerequisites
-*   Node.js (v18 or higher)
-*   MongoDB URI (Local or Atlas)
-*   Google Gemini API Key (Generate one at [Google AI Studio](https://aistudio.google.com/))
-*   Google OAuth Credentials (Optional, for Google Login)
+*   **Node.js** (v18.0.0 or higher)
+*   **MongoDB Atlas** URI or local MongoDB instance
+*   **Google Gemini API Key** (Obtain from [Google AI Studio](https://aistudio.google.com/))
+*   **Google OAuth Credentials** (Optional, for Google Sign-In)
 
 ### 2. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd careerpilot-ai
+git clone https://github.com/abhinavpramanik/CareerPilot-AI.git
+cd CareerPilot-AI
 ```
 
 ### 3. Install Dependencies
@@ -102,7 +196,7 @@ npm install
 ```
 
 ### 4. Environment Variables
-Create a `.env.local` file in the root directory and populate it with the following keys:
+Create a `.env.local` file in the project root:
 
 ```env
 # MongoDB Database
@@ -110,7 +204,7 @@ MONGODB_URI="mongodb+srv://<user>:<password>@cluster.mongodb.net/careerpilot"
 
 # NextAuth Configuration
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="generate-a-random-32-char-string-here"
+NEXTAUTH_SECRET="your-secure-random-32-char-string"
 
 # Google Gemini AI Key
 GEMINI_API_KEY="your-gemini-api-key"
@@ -130,10 +224,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ---
 
 ## 🎨 Design Philosophy
-The UI/UX is heavily inspired by modern developer tools (Vercel, Linear). It utilizes dark mode natively, with soft pastel accents, glassmorphism (`backdrop-blur`), and subtle hover micro-animations to create an interface that feels highly premium, responsive, and alive.
+CareerPilot AI delivers an editorial, developer-first aesthetic inspired by tools like Vercel and Linear. Built natively with dual dark/light themes, subtle glassmorphism (`backdrop-blur`), accessible contrast ratios, and micro-animations, the interface provides a responsive, intuitive, and elevated experience for career acceleration.
 
 ---
 
 <div align="center">
-  <i>Built with ❤️ for students navigating their career paths.</i>
+  <i>Empowering students and engineers to navigate their careers with clarity and confidence.</i>
 </div>
