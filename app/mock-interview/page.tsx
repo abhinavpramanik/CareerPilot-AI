@@ -49,7 +49,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import { VoiceRecorder } from "@/components/mock-interview/VoiceRecorder";
+import { VoiceRecorder, VoiceRecorderRef } from "@/components/mock-interview/VoiceRecorder";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -445,7 +445,7 @@ function SetupStage({
 interface ActiveStageProps {
   questions: ClientQuestion[];
   answers: string[];
-  setAnswers: (answers: string[]) => void;
+  setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
   current: number;
   setCurrent: (i: number) => void;
   role: string;
@@ -480,6 +480,9 @@ function ActiveStage({
   onToggleTimer,
 }: ActiveStageProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const voiceRecorderRef = useRef<VoiceRecorderRef>(null);
+  const [recorderState, setRecorderState] = useState<"idle" | "recording" | "transcribing">("idle");
+  const [isSavingAndNavigating, setIsSavingAndNavigating] = useState(false);
   const [showFinishDialog, setShowFinishDialog] = useState(false);
   const total = questions.length;
   const q = questions[current];
@@ -494,9 +497,47 @@ function ActiveStage({
   }, [answers, current]);
 
   const updateAnswer = (value: string) => {
-    const updated = [...answers];
-    updated[current] = value;
-    setAnswers(updated);
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[current] = value;
+      return updated;
+    });
+  };
+
+  const handleNavigate = async (targetIndex: number) => {
+    if (targetIndex === current || isSavingAndNavigating) return;
+
+    if (voiceRecorderRef.current?.isRecording() || voiceRecorderRef.current?.isTranscribing()) {
+      setIsSavingAndNavigating(true);
+      toast.info("Transcribing and saving your voice answer...", { icon: "🎙️" });
+      try {
+        await voiceRecorderRef.current.stopAndTranscribe();
+      } catch (err) {
+        console.error("Auto-transcription on navigation failed:", err);
+      } finally {
+        setIsSavingAndNavigating(false);
+      }
+    }
+
+    setCurrent(targetIndex);
+  };
+
+  const handleFinishClick = async () => {
+    if (isSavingAndNavigating || submitting) return;
+
+    if (voiceRecorderRef.current?.isRecording() || voiceRecorderRef.current?.isTranscribing()) {
+      setIsSavingAndNavigating(true);
+      toast.info("Transcribing and saving your final voice answer...", { icon: "🎙️" });
+      try {
+        await voiceRecorderRef.current.stopAndTranscribe();
+      } catch (err) {
+        console.error("Auto-transcription on finish failed:", err);
+      } finally {
+        setIsSavingAndNavigating(false);
+      }
+    }
+
+    setShowFinishDialog(true);
   };
 
   const answeredCount = answers.filter((a) => a.trim().length > 0).length;
@@ -617,7 +658,8 @@ function ActiveStage({
                   <button
                     key={i}
                     type="button"
-                    onClick={() => setCurrent(i)}
+                    disabled={isSavingAndNavigating}
+                    onClick={() => handleNavigate(i)}
                     title={`Question ${i + 1}`}
                     className={`h-1.5 rounded-full transition-all ${
                       i === current
@@ -663,12 +705,17 @@ function ActiveStage({
                 </div>
               </div>
               <VoiceRecorder
+                ref={voiceRecorderRef}
+                onStateChange={setRecorderState}
                 onTranscribe={(cleanText) => {
-                  const existing = answers[current]?.trim() || "";
-                  const merged = existing ? `${existing} ${cleanText}` : cleanText;
-                  updateAnswer(merged);
+                  setAnswers((prev) => {
+                    const updated = [...prev];
+                    const existing = updated[current]?.trim() || "";
+                    updated[current] = existing ? `${existing} ${cleanText}` : cleanText;
+                    return updated;
+                  });
                 }}
-                disabled={submitting}
+                disabled={submitting || isSavingAndNavigating}
               />
             </div>
 
@@ -702,29 +749,64 @@ function ActiveStage({
           <Button
             variant="outline"
             className="rounded-xl gap-2 h-10 px-4 text-xs font-medium"
-            disabled={current === 0}
-            onClick={() => setCurrent(current - 1)}
+            disabled={current === 0 || isSavingAndNavigating}
+            onClick={() => handleNavigate(current - 1)}
           >
-            <ChevronLeft className="h-4 w-4" /> Previous
+            <ChevronLeft className="h-4 w-4" />
+            {recorderState === "recording" ? "Save & Previous" : "Previous"}
           </Button>
 
           {current < total - 1 ? (
             <Button
-              className="rounded-xl gap-2 bg-primary text-white h-10 px-5 text-xs font-medium shadow-2xs"
-              onClick={() => setCurrent(current + 1)}
+              className={`rounded-xl gap-2 text-white h-10 px-5 text-xs font-medium shadow-2xs transition-all ${
+                recorderState === "recording"
+                  ? "bg-emerald-600 hover:bg-emerald-700 animate-pulse"
+                  : "bg-primary"
+              }`}
+              disabled={isSavingAndNavigating}
+              onClick={() => handleNavigate(current + 1)}
             >
-              Next Question <ChevronRight className="h-4 w-4" />
+              {isSavingAndNavigating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving Answer...
+                </>
+              ) : recorderState === "recording" ? (
+                <>
+                  Save & Next Question <ChevronRight className="h-4 w-4" />
+                </>
+              ) : (
+                <>
+                  Next Question <ChevronRight className="h-4 w-4" />
+                </>
+              )}
             </Button>
           ) : (
             <Button
               className="rounded-xl gap-2 bg-emerald-600 hover:bg-emerald-700 text-white h-10 px-5 text-xs font-medium shadow-2xs"
-              onClick={() => setShowFinishDialog(true)}
-              disabled={submitting}
+              onClick={handleFinishClick}
+              disabled={submitting || isSavingAndNavigating}
             >
               {submitting ? (
-                <><Loader2 className="h-4 w-4 animate-spin" />Evaluating...</>
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Evaluating...
+                </>
+              ) : isSavingAndNavigating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving Final Answer...
+                </>
+              ) : recorderState === "recording" ? (
+                <>
+                  <Send className="h-4 w-4" />
+                  Save & Finish
+                </>
               ) : (
-                <><Send className="h-4 w-4" />Finish & Get Report</>
+                <>
+                  <Send className="h-4 w-4" />
+                  Finish & Get Report
+                </>
               )}
             </Button>
           )}

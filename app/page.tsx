@@ -1,4 +1,4 @@
-99"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -226,13 +226,6 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <div className="hidden sm:block w-px h-4 bg-border"></div>
-            <Link href="/mock-interview" className="hidden sm:flex">
-              <Button variant="outline" size="sm" className="gap-1.5 border-primary/30 text-foreground hover:bg-primary/10">
-                <Video className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-semibold">Mock Interview</span>
-              </Button>
-            </Link>
             <Link href="/login" className="hidden md:block">
               <Button variant="ghost" size="sm" className="text-sm font-medium">
                 Sign In
