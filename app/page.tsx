@@ -327,12 +327,23 @@ export default function LandingPage() {
                 transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
                 className="relative z-10 w-full"
               >
+                {/* Mobile / Small Screens: Compact Vertical Layout */}
+                <Image
+                  src="/Hero_section_Img_small_screen_version.png"
+                  alt="CareerPilot AI Platform Ecosystem"
+                  width={1230}
+                  height={1278}
+                  className="w-full max-w-md mx-auto h-auto drop-shadow-2xl pointer-events-none select-none object-contain block md:hidden"
+                  draggable={false}
+                  priority
+                />
+                {/* Tablet & Desktop / Larger Screens: Wide Horizontal Layout */}
                 <Image
                   src="/Hero_section_Img.png"
                   alt="CareerPilot AI Platform Ecosystem"
-                  width={1400}
-                  height={933}
-                  className="w-full h-auto drop-shadow-2xl pointer-events-none select-none object-contain"
+                  width={1536}
+                  height={1024}
+                  className="w-full h-auto drop-shadow-2xl pointer-events-none select-none object-contain hidden md:block"
                   draggable={false}
                   priority
                 />
